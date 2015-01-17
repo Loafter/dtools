@@ -1,3 +1,0 @@
-threadjobqueue
-type FilamentousJobQueue struct {
-}
