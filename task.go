@@ -1,41 +1,29 @@
 package main
 
-import "net/http"
+const (
+	Started = iota
+	Failed
+	Done
+)
 
-type Tasker interface {
-	TaskId() string
-	TaskType() int
-	IsConflict(tasker Tasker) bool
+type IsVerifiable interface {
+	IsConflict(IsVerifiable) bool
 }
-type BasicTask struct {
-	Type int    `json:"Type,string,omitempty"`
-	Id   string `json:"Id,string,omitempty"`
-}
-
-func (basicTask *BasicTask) TaskType() int {
-	return basicTask.Type
-}
-func (basicTask *BasicTask) TaskId() string {
-	return basicTask.Id
+type Job struct {
+	JobId   string
+	JobData interface{}
 }
 
-func (basicTask *BasicTask) IsConflict(tasker Tasker) bool {
-	return false
-	//return basicTask.Type == tasker.TaskType()
+type FailedJob struct {
+	JobId     string
+	ErrorData error
+	Data      interface{}
+}
+
+type DoneJob struct {
+	JobId string
+	Data  interface{}
 }
 
 type TerminateDispatchJob struct {
-}
-
-type TaskResponse struct {
-	Tasker         Tasker
-	responseWriter http.ResponseWriter
-	httpRequest    *http.Request
-}
-
-type TaskError struct {
-	Error          error
-	Tasker         Tasker
-	responseWriter http.ResponseWriter
-	httpRequest    *http.Request
 }

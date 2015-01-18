@@ -1,9 +1,12 @@
 package main
 
 import "testing"
-import "errors"
 import "log"
+
 import "time"
+import "errors"
+
+//import "sync"
 
 type TestJobDispatcher struct {
 }
@@ -11,25 +14,27 @@ type TestJobDispatcher struct {
 type TestErrorDispatcher struct {
 }
 
-func (testJobDispatcher *TestJobDispatcher) Dispatch(taskResponse TaskResponse, resultChan chan interface{}) error {
-	go func() {
-		if taskResponse.Tasker.TaskId() == "erroid" {
-			resultChan <- errors.New("error catched")
-		} else if taskResponse.Tasker.TaskId() == "workid" {
-			resultChan <- taskResponse.Tasker
-		} else if taskResponse.Tasker.TaskId() == "errnotif" {
-			resultChan <- TaskError{Error: errors.New("error catched"), Tasker: taskResponse.Tasker}
-		}
-	}()
+func DispatchTh(jobd interface{}, resultChan chan interface{}) {
+	job := jobd.(Job)
+	for i := 0; i < 9999; i++ {
+
+	}
+	if job.JobId == "erroid" {
+
+		resultChan <- FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}
+	}
+	if job.JobId == "workid" {
+		resultChan <- DoneJob{JobId: "workid"}
+	}
+}
+
+func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}, resultChan chan interface{}) error {
+	go DispatchTh(jobd, resultChan)
 	return nil
 }
 
-func (testErrorDispatcher *TestErrorDispatcher) NotifyError(taskError TaskError) error {
-	log.Println(taskError.Error.Error())
-	return nil
-}
-func (testErrorDispatcher *TestErrorDispatcher) DispatchError(err error) error {
-	log.Println(err.Error())
+func (testErrorDispatcher *TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
+	log.Print("success dispatch error")
 	return nil
 }
 
@@ -38,28 +43,19 @@ func TestJobBallancer(t *testing.T) {
 	testErrorDispatcher := TestErrorDispatcher{}
 	jobBallancer := JobBallancer{}
 	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher)
-	err := jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "workid"}, responseWriter: nil, httpRequest: nil})
-	if err != nil {
-		log.Println("error: push err job failed " + err.Error())
-		t.Errorf("error: push normal job failed ")
+
+	if err := jobBallancer.PushJob(Job{JobId: "workid"}); err != nil {
+		t.Errorf("error: push err job failed " + err.Error())
 		return
 	}
 
-	err = jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "erroid"}, responseWriter: nil, httpRequest: nil})
-	if err != nil {
-		log.Println("error: push err job failed " + err.Error())
-		t.Errorf("error: push err job failed ")
+	if err := jobBallancer.PushJob(Job{JobId: "erroid"}); err != nil {
+		t.Errorf("error: push err job failed " + err.Error())
 		return
 	}
-
-	err = jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "errnotif"}, responseWriter: nil, httpRequest: nil})
-	if err != nil {
-		log.Println("error: push err job failed " + err.Error())
-		t.Errorf("error: push errnot job failed ")
-		return
+	time.Sleep(time.Second)
+	if err := jobBallancer.TerminateTakeJob(); err != nil {
+		t.Errorf("error: terminate job failed " + err.Error())
 	}
-	jobBallancer.TerminateTakeJob()
-
-	time.Sleep(5 * time.Second)
 
 }

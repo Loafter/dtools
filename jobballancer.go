@@ -5,64 +5,68 @@ import "errors"
 import "sync"
 
 type JobDispatcher interface {
-	Dispatch(TaskResponse, chan interface{}) error
+	Dispatch(interface{}, chan interface{}) error
 }
 
 type ErrorDispatcher interface {
-	NotifyError(TaskError) error
-	DispatchError(error) error
+	DispatchError(*FailedJob) error
 }
 
 type JobBallancer struct {
 	inJobChan       chan interface{}
-	activeJob       map[string]Tasker
+	activeJob       map[string]interface{}
 	errorDispatcher ErrorDispatcher
 	jobDispatcher   JobDispatcher
 	waitJobDone     sync.WaitGroup
+	I               int
 }
 
 func (jobBallancer *JobBallancer) takeJob() {
 	jobBallancer.waitJobDone.Add(1)
-	defer jobBallancer.waitJobDone.Done()
 	for {
 		//extract job from queue
-		log.Println("info: start wait take job")
 		recivedTask := <-jobBallancer.inJobChan
 		log.Println("info: job taken")
-		switch task := recivedTask.(type) {
+		switch job := recivedTask.(type) {
 		case TerminateDispatchJob:
-			//if we recive recive terminate signal return
+			//if we recive terminate signal need return
 			log.Println("info: recive terminate dispatch singal")
+			jobBallancer.waitJobDone.Done()
 			return
-		case TaskResponse:
+		case Job:
 			//regular dispath
-			jobBallancer.addJob(task.Tasker)
-			jobBallancer.jobDispatcher.Dispatch(task, jobBallancer.inJobChan)
+			jobBallancer.waitJobDone.Add(1)
+			jobBallancer.addJob(job.JobId, job.JobData)
+			jobBallancer.jobDispatcher.Dispatch(job, jobBallancer.inJobChan)
 			log.Println("info: normal dispatch")
-		case Tasker:
-			log.Println("info: try remove task id=" + task.TaskId())
-			err := jobBallancer.removeJob(task)
+		case DoneJob:
+			log.Println("info: try remove task id=" + job.JobId)
+			err := jobBallancer.removeJob(job.JobId)
 			if err == nil {
-				log.Println("info: successul remove task id=" + task.TaskId())
+				log.Println("info: successul remove task id=" + job.JobId)
 			} else {
-				log.Println("error: faled remove task with err " + err.Error())
+				log.Println("error: faled remove task with err " + job.JobId)
 			}
-		case TaskError:
-			log.Println("error: " + task.Error.Error())
-			jobBallancer.errorDispatcher.NotifyError(task)
-		case error:
-			log.Println("error: " + task.Error())
-			jobBallancer.errorDispatcher.DispatchError(task)
+			jobBallancer.waitJobDone.Done()
+		case FailedJob:
+			err := jobBallancer.removeJob(job.JobId)
+			if err == nil {
+				log.Println("info: successul remove failed task id=" + job.JobId)
+			} else {
+				log.Println("error: faled remove failed task id=" + job.JobId)
+			}
+			jobBallancer.errorDispatcher.DispatchError(&job)
+			jobBallancer.waitJobDone.Done()
 		default:
-			log.Println("error: unknown type")
+			log.Println("error: unknown job type")
 		}
 	}
 }
 
 //remove successul complited job
-func (jobBallancer *JobBallancer) removeJob(tasker Tasker) error {
-	if _, isFind := jobBallancer.activeJob[tasker.TaskId()]; isFind {
-		delete(jobBallancer.activeJob, tasker.TaskId())
+func (jobBallancer *JobBallancer) removeJob(jobId string) error {
+	if _, isFind := jobBallancer.activeJob[jobId]; isFind {
+		delete(jobBallancer.activeJob, jobId)
 	} else {
 		return errors.New("error: can't remove job because job with id not found")
 	}
@@ -70,30 +74,35 @@ func (jobBallancer *JobBallancer) removeJob(tasker Tasker) error {
 }
 
 //add job
-func (jobBallancer *JobBallancer) addJob(tasker Tasker) error {
+func (jobBallancer *JobBallancer) addJob(id string, job interface{}) error {
 	if jobBallancer.activeJob == nil {
 		return errors.New("error: job list is null")
 	}
-	jobBallancer.activeJob[tasker.TaskId()] = tasker
+	jobBallancer.activeJob[id] = job
 	return nil
 }
 
 //check if work confilct
-func (jobBallancer *JobBallancer) isConflictedJob(tasker Tasker) bool {
+func (jobBallancer *JobBallancer) isConflictedJob(taskData interface{}) bool {
+	if _, ok := taskData.(IsVerifiable); !ok {
+		errors.New("warning: this task date is not verifiable")
+		return false
+	}
 	for _, job := range jobBallancer.activeJob {
-		if job.(Tasker).IsConflict(tasker) {
-			return true
+		if ver, ok := job.(IsVerifiable); !ok {
+			if ver.IsConflict(ver) {
+				return true
+			}
 		}
-
 	}
 	return false
 }
 
-func (jobBallancer *JobBallancer) PushJob(taskResponse TaskResponse) error {
+func (jobBallancer *JobBallancer) PushJob(job Job) error {
 	if jobBallancer.inJobChan == nil {
-		return errors.New("error: is not inited")
+		return errors.New("error: JobChan is not inited")
 	}
-	jobBallancer.inJobChan <- taskResponse
+	jobBallancer.inJobChan <- job
 	return nil
 }
 
@@ -102,18 +111,21 @@ func (jobBallancer *JobBallancer) TerminateTakeJob() error {
 		return errors.New("error: is not inited")
 	}
 	jobBallancer.inJobChan <- TerminateDispatchJob{}
-	if len(jobBallancer.activeJob) > 0 {
-		log.Println("warning: list job is not empty")
-	}
+	log.Print("count ")
+	log.Println(jobBallancer.I)
 	jobBallancer.waitJobDone.Wait()
-	log.Println("infor: greacefully terminate take job")
+	if len(jobBallancer.activeJob) > 0 {
+		return errors.New("error: list job is not empty")
+	}
+
+	log.Println("info: greacefully terminate take job")
 	return nil
 }
 
 func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, errorDispatcher ErrorDispatcher) {
 	jobBallancer.errorDispatcher = errorDispatcher
 	jobBallancer.jobDispatcher = jobDispatcher
-	jobBallancer.activeJob = make(map[string]Tasker)
+	jobBallancer.activeJob = make(map[string]interface{})
 	jobBallancer.inJobChan = make(chan interface{})
 	go jobBallancer.takeJob()
 }
