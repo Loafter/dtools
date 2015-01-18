@@ -1,44 +1,65 @@
-// In this example we'll look at how to implement
-// a _worker pool_ using goroutines and channels.
-
 package main
 
 import "testing"
+import "errors"
 import "log"
 import "time"
 
-// Here's the worker, of which we'll run several
-// concurrent instances. These workers will receive
-// work on the `jobs` channel and send the corresponding
-// results on `results`. We'll sleep a second per job to
-// simulate an expensive task.
-func worker(id int, jobs <-chan int, results chan<- int) {
-	j := <-jobs
-	log.Println("worker", id, "processing job", j)
-	time.Sleep(time.Second)
-	results <- j * 2
+type TestJobDispatcher struct {
 }
 
-func TestPool(t *testing.T) {
+type TestErrorDispatcher struct {
+}
 
-	// In order to use our pool of workers we need to send
-	// them work and collect their results. We make 2
-	// channels for this.
-	jobs := make(chan int)
-	results := make(chan int)
+func (testJobDispatcher *TestJobDispatcher) Dispatch(taskResponse TaskResponse, resultChan chan interface{}) error {
+	go func() {
+		if taskResponse.Tasker.TaskId() == "erroid" {
+			resultChan <- errors.New("error catched")
+		} else if taskResponse.Tasker.TaskId() == "workid" {
+			resultChan <- taskResponse.Tasker
+		} else if taskResponse.Tasker.TaskId() == "errnotif" {
+			resultChan <- TaskError{Error: errors.New("error catched"), Tasker: taskResponse.Tasker}
+		}
+	}()
+	return nil
+}
 
-	// This starts up 3 workers, initially blocked
-	// because there are no jobs yet.
-	for w := 1; w <= 5; w++ {
-		go worker(w, jobs, results)
+func (testErrorDispatcher *TestErrorDispatcher) NotifyError(taskError TaskError) error {
+	log.Println(taskError.Error.Error())
+	return nil
+}
+func (testErrorDispatcher *TestErrorDispatcher) DispatchError(err error) error {
+	log.Println(err.Error())
+	return nil
+}
+
+func TestJobBallancer(t *testing.T) {
+	testJobDispatcher := TestJobDispatcher{}
+	testErrorDispatcher := TestErrorDispatcher{}
+	jobBallancer := JobBallancer{}
+	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher)
+	err := jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "workid"}, responseWriter: nil, httpRequest: nil})
+	if err != nil {
+		log.Println("error: push err job failed " + err.Error())
+		t.Errorf("error: push normal job failed ")
+		return
 	}
 
-	// Here we send 9 `jobs` and then `close` that
-	// channel to indicate that's all the work we have.
-	for j := 1; j <= 10; j++ {
-		//activeJobCount := len(jobs)
-		jobs <- j
+	err = jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "erroid"}, responseWriter: nil, httpRequest: nil})
+	if err != nil {
+		log.Println("error: push err job failed " + err.Error())
+		t.Errorf("error: push err job failed ")
+		return
 	}
-	close(jobs)
+
+	err = jobBallancer.PushJob(TaskResponse{Tasker: &BasicTask{Id: "errnotif"}, responseWriter: nil, httpRequest: nil})
+	if err != nil {
+		log.Println("error: push err job failed " + err.Error())
+		t.Errorf("error: push errnot job failed ")
+		return
+	}
+	jobBallancer.TerminateTakeJob()
+
+	time.Sleep(5 * time.Second)
 
 }

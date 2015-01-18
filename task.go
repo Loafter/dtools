@@ -15,9 +15,13 @@ type BasicTask struct {
 func (basicTask *BasicTask) TaskType() int {
 	return basicTask.Type
 }
+func (basicTask *BasicTask) TaskId() string {
+	return basicTask.Id
+}
 
 func (basicTask *BasicTask) IsConflict(tasker Tasker) bool {
-	return basicTask.Type == tasker.TaskType()
+	return false
+	//return basicTask.Type == tasker.TaskType()
 }
 
 type TerminateDispatchJob struct {
