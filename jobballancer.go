@@ -34,7 +34,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 			//regular dispath
 			jobBallancer.waitJobDone.Add(1)
 			jobBallancer.addJob(job.JobId, job.JobData)
-			jobBallancer.jobDispatcher.Dispatch(job, jobBallancer.inJobChan)
+			go jobBallancer.jobDispatcher.Dispatch(job, jobBallancer.inJobChan)
 			log.Println("info: normal dispatch")
 		case DoneJob:
 			log.Println("info: try remove task id=" + job.JobId)

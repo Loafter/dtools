@@ -12,6 +12,10 @@ type TestErrorDispatcher struct {
 }
 
 func DispatchTh(jobd interface{}, resultChan chan interface{}) {
+
+}
+
+func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}, resultChan chan interface{}) error {
 	job := jobd.(Job)
 
 	if job.JobId == "erroid" {
@@ -23,10 +27,6 @@ func DispatchTh(jobd interface{}, resultChan chan interface{}) {
 	} else {
 		resultChan <- FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}
 	}
-}
-
-func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}, resultChan chan interface{}) error {
-	go DispatchTh(jobd, resultChan)
 	return nil
 }
 
