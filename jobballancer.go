@@ -18,11 +18,9 @@ type JobBallancer struct {
 	errorDispatcher ErrorDispatcher
 	jobDispatcher   JobDispatcher
 	waitJobDone     sync.WaitGroup
-	I               int
 }
 
 func (jobBallancer *JobBallancer) takeJob() {
-	jobBallancer.waitJobDone.Add(1)
 	for {
 		//extract job from queue
 		recivedTask := <-jobBallancer.inJobChan
@@ -31,7 +29,6 @@ func (jobBallancer *JobBallancer) takeJob() {
 		case TerminateDispatchJob:
 			//if we recive terminate signal need return
 			log.Println("info: recive terminate dispatch singal")
-			jobBallancer.waitJobDone.Done()
 			return
 		case Job:
 			//regular dispath
@@ -110,10 +107,10 @@ func (jobBallancer *JobBallancer) TerminateTakeJob() error {
 	if jobBallancer.inJobChan == nil {
 		return errors.New("error: is not inited")
 	}
-	jobBallancer.inJobChan <- TerminateDispatchJob{}
-	log.Print("count ")
-	log.Println(jobBallancer.I)
 	jobBallancer.waitJobDone.Wait()
+	jobBallancer.inJobChan <- TerminateDispatchJob{}
+
+	close(jobBallancer.inJobChan)
 	if len(jobBallancer.activeJob) > 0 {
 		return errors.New("error: list job is not empty")
 	}
