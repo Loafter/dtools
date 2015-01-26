@@ -1,5 +1,5 @@
 package main
 
 type DCDispatcher struct {
-	DCOMClient
+	dcomClient DCOMClient
 }

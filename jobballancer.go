@@ -5,7 +5,7 @@ import "errors"
 import "sync"
 
 type JobDispatcher interface {
-	Dispatch(interface{}, chan interface{}) error
+	Dispatch(interface{}) (error, interface{})
 }
 
 type ErrorDispatcher interface {
@@ -18,6 +18,16 @@ type JobBallancer struct {
 	errorDispatcher ErrorDispatcher
 	jobDispatcher   JobDispatcher
 	waitJobDone     sync.WaitGroup
+}
+
+func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
+	err, dispResult := jobBallancer.jobDispatcher.Dispatch(jobd)
+	if err != nil {
+		jobBallancer.inJobChan <- err
+	} else {
+		jobBallancer.inJobChan <- dispResult
+	}
+
 }
 
 func (jobBallancer *JobBallancer) takeJob() {
@@ -34,7 +44,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 			//regular dispath
 			jobBallancer.waitJobDone.Add(1)
 			jobBallancer.addJob(job.JobId, job.JobData)
-			go jobBallancer.jobDispatcher.Dispatch(job, jobBallancer.inJobChan)
+			go jobBallancer.startJob(job)
 			log.Println("info: normal dispatch")
 		case DoneJob:
 			log.Println("info: try remove task id=" + job.JobId)

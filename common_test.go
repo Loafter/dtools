@@ -15,19 +15,19 @@ func DispatchTh(jobd interface{}, resultChan chan interface{}) {
 
 }
 
-func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}, resultChan chan interface{}) error {
+func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}) (error, interface{}) {
 	job := jobd.(Job)
 
 	if job.JobId == "erroid" {
 		time.Sleep(time.Second * 2)
-		resultChan <- FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}
+		return nil, FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}
 	} else if job.JobId == "workid" {
 		time.Sleep(time.Second * 1)
-		resultChan <- DoneJob{JobId: "workid"}
+		return nil, DoneJob{JobId: "workid"}
 	} else {
-		resultChan <- FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}
+		return nil, FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}
 	}
-	return nil
+	return errors.New(""), nil
 }
 
 func (testErrorDispatcher *TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
@@ -74,4 +74,13 @@ func TestJobBallancerNowait(t *testing.T) {
 	if err := jobBallancer.TerminateTakeJob(); err != nil {
 		t.Errorf("error: terminate job failed " + err.Error())
 	}
+}
+
+func TestDicomClient(t *testing.T) {
+	/*DCOMClient:=DCOMClient{
+			Address :
+	Port           uint16
+	ServerAE_Title string
+	CallerAE_Title string
+	}*/
 }
