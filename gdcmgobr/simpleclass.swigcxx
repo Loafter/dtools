@@ -1,0 +1,9 @@
+/* File : example.i */
+%module simpleclass
+
+%{
+#include "simpleclass.h"
+%}
+
+/* Let's just grab the original header file here */
+%include "simpleclass.h"
