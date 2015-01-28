@@ -5,6 +5,7 @@ import "net/http"
 import "strconv"
 import "log"
 import "encoding/json"
+import "errors"
 
 type HttpResReq struct {
 	ResponseWriter http.ResponseWriter
@@ -13,23 +14,24 @@ type HttpResReq struct {
 
 //main service class
 type DicomJsonService struct {
-	jobBallancer *JobBallancer
+	jobBallancer    JobBallancer
+	dicomDispatcher DicomDispatcher
 }
 
 //start and init service
 func (service *DicomJsonService) Start(listenPort int) error {
 	http.HandleFunc("/c-echo", service.cEcho)
 	http.HandleFunc("/index.html", service.ServePage)
-	retVal := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil)
-	service.jobBallancer = &JobBallancer{}
-	/*dcomClient := DCOMClient{CallerAE_Title: "AE_DTOOLS"}
-	errorDispatcher := DicomErrorDispatcher{}
-	//service.jobBallancer.Init(&DicomDispatcher{dcomClient: dcomClient}, &errorDispatcher)
-	*/return retVal
+	if err := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil); err != nil {
+		return errors.New("error: can't start listen http server")
+	}
+	service.jobBallancer.Init(&service.dicomDispatcher, nil, nil)
+	return nil
 }
 
 //serve cEcho responce
 func (service *DicomJsonService) cEcho(responseWriter http.ResponseWriter, request *http.Request) {
+	defer request.Body.Close()
 	bodyData, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		strErr := "error: Can't read http body data"

@@ -4,23 +4,32 @@ import "testing"
 import "log"
 import "time"
 import "errors"
+import "math"
+import "strconv"
 
 //import "fmt"
 
 type TestJobDispatcher struct {
+	i int
 }
 
-func (*TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
-	time.Sleep(1 * time.Second)
+func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
+	time.Sleep(500 * time.Duration(test.i) * time.Millisecond)
+	test.i++
+
 	log.Printf("info: try dispatch data %v", data)
-	return nil, errors.New("gen error")
+	if math.Mod(float64(test.i), 2) == 0.0 {
+		return nil, errors.New("gen error")
+	} else {
+		return data, nil
+	}
 }
 
 type TestErrorDispatcher struct {
 }
 
 func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob, data interface{}) error {
-	log.Printf("DispatchError job %v job data %v \n", failedJob, data)
+	log.Printf("info: DispatchError job %v job data %v \n", failedJob, data)
 	return nil
 }
 
@@ -28,7 +37,7 @@ type TestCompletedDispatcher struct {
 }
 
 func (*TestCompletedDispatcher) DispatchSuccess(completedJob *CompletedJob, data interface{}) error {
-	log.Printf("TestCompletedDispatcher job %v job data %v \n", completedJob, data)
+	log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob, data)
 	return nil
 }
 
@@ -38,34 +47,14 @@ func TestJobBallancer(t *testing.T) {
 	testSuccessDispatcher := TestCompletedDispatcher{}
 	jobBallancer := JobBallancer{}
 	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher, &testSuccessDispatcher)
+	for i := 0; i < 10; i++ {
+		jobBallancer.PushJob("is error"+strconv.Itoa(i), "dataToDispatchSuccess", "dataToDispatchError")
+	}
 
-	jobBallancer.PushJob("is error", "dataToDispatchSuccess", "dataToDispatchError")
-	time.Sleep(time.Second * 4)
 	jobBallancer.TerminateTakeJob()
 
 }
 
-/*
-func TestJobBallancerNowait(t *testing.T) {
-	testJobDispatcher := TestJobDispatcher{}
-	testErrorDispatcher := TestErrorDispatcher{}
-	jobBallancer := JobBallancer{}
-	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher)
-
-	jobBallancer.PushJob(Job{JobId: "erroid1"})
-	jobBallancer.PushJob(Job{JobId: "erroid2"})
-	jobBallancer.PushJob(Job{JobId: "erroid3"})
-	jobBallancer.PushJob(Job{JobId: "erroid4"})
-	jobBallancer.PushJob(Job{JobId: "erroid5"})
-	jobBallancer.PushJob(Job{JobId: "erroid6"})
-	jobBallancer.PushJob(Job{JobId: "erroid7"})
-	jobBallancer.PushJob(Job{JobId: "erroid8"})
-	jobBallancer.PushJob(Job{JobId: "erroid9"})
-	if err := jobBallancer.TerminateTakeJob(); err != nil {
-		t.Errorf("error: terminate job failed " + err.Error())
-	}
-}
-*/
 func TestDicomClient(t *testing.T) {
 	/*DCOMClient:=DCOMClient{
 			Address :

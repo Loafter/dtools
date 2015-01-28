@@ -25,14 +25,18 @@ type JobBallancer struct {
 	jobDispatcher       JobDispatcher
 	completedDispatcher CompletedDispatcher
 	waitJobDone         sync.WaitGroup
+	count               int
 }
 
 func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
-	err, dispResult := jobBallancer.jobDispatcher.Dispatch(jobd)
+	job := jobd.(Job)
+	dispResult, err := jobBallancer.jobDispatcher.Dispatch(jobd)
 	if err != nil {
-		jobBallancer.inJobChan <- err
+		log.Println("info: failed job detected")
+		jobBallancer.inJobChan <- FailedJob{JobId: job.JobId, ErrorData: err}
 	} else {
-		jobBallancer.inJobChan <- dispResult
+		log.Println("info: compleated job detected")
+		jobBallancer.inJobChan <- CompletedJob{JobId: job.JobId, ResultData: dispResult}
 	}
 
 }
@@ -49,7 +53,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 			return
 		case Job:
 			//regular dispath
-			jobBallancer.waitJobDone.Add(1)
+			jobBallancer.count++
 			jobBallancer.addJob(job)
 			go jobBallancer.startJob(job)
 			log.Println("info: normal dispatch")
@@ -70,6 +74,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 				log.Println("error: faled remove task with err " + job.JobId)
 			}
 			jobBallancer.waitJobDone.Done()
+			jobBallancer.count--
 		case FailedJob:
 			//notyfy about failed job
 			getJob, err := jobBallancer.getJobByID(job.JobId)
@@ -87,9 +92,11 @@ func (jobBallancer *JobBallancer) takeJob() {
 			}
 
 			jobBallancer.waitJobDone.Done()
-
+			jobBallancer.count--
 		default:
 			log.Println("error: unknown job type")
+			jobBallancer.count--
+			jobBallancer.waitJobDone.Done()
 		}
 	}
 }
@@ -143,7 +150,7 @@ func (jobBallancer *JobBallancer) PushJob(jobData interface{}, dataToDispatchSuc
 		return errors.New("error: JobChan is not inited")
 	}
 	job := Job{JobId: genUid(), Data: jobData, DataToError: dataToDispatchError, DataToSuccess: dataToDispatchSuccess}
-
+	jobBallancer.waitJobDone.Add(1)
 	jobBallancer.inJobChan <- job
 	return nil
 }
@@ -154,7 +161,6 @@ func (jobBallancer *JobBallancer) TerminateTakeJob() error {
 	}
 	jobBallancer.waitJobDone.Wait()
 	jobBallancer.inJobChan <- TerminateDispatchJob{}
-
 	close(jobBallancer.inJobChan)
 	if len(jobBallancer.activeJob) > 0 {
 		return errors.New("error: list job is not empty")
