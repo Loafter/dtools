@@ -17,6 +17,7 @@ type ErrorDispatcher interface {
 type CompletedDispatcher interface {
 	DispatchSuccess(*CompletedJob, interface{}) error
 }
+
 type JobBallancer struct {
 	inJobChan           chan interface{}
 	activeJob           map[string]Job
@@ -54,32 +55,37 @@ func (jobBallancer *JobBallancer) takeJob() {
 			log.Println("info: normal dispatch")
 		case CompletedJob:
 			log.Println("info: try remove task id=" + job.JobId)
-			err := jobBallancer.removeJob(job.JobId)
+			//notify about sucess
+			getJob, err := jobBallancer.getJobByID(job.JobId)
+			if err == nil {
+				jobBallancer.completedDispatcher.DispatchSuccess(&job, getJob.DataToSuccess)
+			} else {
+				log.Println("error: failed dispatch success" + job.JobId)
+			}
+			//remove success compleated job
+			err = jobBallancer.removeJob(job.JobId)
 			if err == nil {
 				log.Println("info: successul remove task id=" + job.JobId)
 			} else {
 				log.Println("error: faled remove task with err " + job.JobId)
 			}
-			getJob, err := jobBallancer.getJobByID(job.JobId)
-			if err == nil {
-				jobBallancer.completedDispatcher.DispatchSuccess(&job, getJob)
-			} else {
-				log.Println("error: failed dispatch success" + job.JobId)
-			}
 			jobBallancer.waitJobDone.Done()
 		case FailedJob:
-			err := jobBallancer.removeJob(job.JobId)
+			//notyfy about failed job
+			getJob, err := jobBallancer.getJobByID(job.JobId)
+			if err == nil {
+				jobBallancer.errorDispatcher.DispatchError(&job, getJob.DataToError)
+			} else {
+				log.Println("error: failef dispatch error" + job.JobId)
+			}
+			//remove failed job
+			err = jobBallancer.removeJob(job.JobId)
 			if err == nil {
 				log.Println("info: successul remove failed task id=" + job.JobId)
 			} else {
 				log.Println("error: faled remove failed task id=" + job.JobId)
 			}
-			getJob, err := jobBallancer.getJobByID(job.JobId)
-			if err == nil {
-				jobBallancer.errorDispatcher.DispatchError(&job, getJob)
-			} else {
-				log.Println("error: failef dispatch error" + job.JobId)
-			}
+
 			jobBallancer.waitJobDone.Done()
 
 		default:
@@ -132,11 +138,13 @@ func (jobBallancer *JobBallancer) isConflictedJob(taskData interface{}) bool {
 	return false
 }
 
-func (jobBallancer *JobBallancer) PushJob(jobData Job, dataToDispatchSuccess interface{}, dataToDispatchError interface{}) error {
+func (jobBallancer *JobBallancer) PushJob(jobData interface{}, dataToDispatchSuccess interface{}, dataToDispatchError interface{}) error {
 	if jobBallancer.inJobChan == nil {
 		return errors.New("error: JobChan is not inited")
 	}
-	jobBallancer.inJobChan <- Job{JobId: genUid(), Data: jobData}
+	job := Job{JobId: genUid(), Data: jobData, DataToError: dataToDispatchError, DataToSuccess: dataToDispatchSuccess}
+
+	jobBallancer.inJobChan <- job
 	return nil
 }
 

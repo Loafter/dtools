@@ -2,59 +2,50 @@ package main
 
 import "testing"
 import "log"
-import "errors"
 import "time"
+import "errors"
+
+//import "fmt"
 
 type TestJobDispatcher struct {
 }
 
-func DispatchTh(jobd interface{}, resultChan chan interface{}) {
-
+func (*TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
+	time.Sleep(1 * time.Second)
+	log.Printf("info: try dispatch data %v", data)
+	return nil, errors.New("gen error")
 }
 
 type TestErrorDispatcher struct {
 }
 
-func (testErrorDispatcher *TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
-	log.Print("success dispatch error")
+func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob, data interface{}) error {
+	log.Printf("DispatchError job %v job data %v \n", failedJob, data)
 	return nil
 }
 
-func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}) (interface{}, error) {
-	job := jobd.(Job)
-	if job.JobId == "erroid" {
-		time.Sleep(time.Second * 2)
-		return FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}, nil
-	} else if job.JobId == "workid" {
-		time.Sleep(time.Second * 1)
-		return DoneJob{JobId: "workid"}, nil
-	} else {
-		return FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}, nil
-	}
-	return errors.New(""), nil
+type TestCompletedDispatcher struct {
+}
+
+func (*TestCompletedDispatcher) DispatchSuccess(completedJob *CompletedJob, data interface{}) error {
+	log.Printf("TestCompletedDispatcher job %v job data %v \n", completedJob, data)
+	return nil
 }
 
 func TestJobBallancer(t *testing.T) {
 	testJobDispatcher := TestJobDispatcher{}
 	testErrorDispatcher := TestErrorDispatcher{}
+	testSuccessDispatcher := TestCompletedDispatcher{}
 	jobBallancer := JobBallancer{}
-	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher)
+	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher, &testSuccessDispatcher)
 
-	if err := jobBallancer.PushJob(Job{JobId: "workid"}); err != nil {
-		t.Errorf("error: push err job failed " + err.Error())
-		return
-	}
-
-	if err := jobBallancer.PushJob(Job{JobId: "erroid"}); err != nil {
-		t.Errorf("error: push err job failed " + err.Error())
-		return
-	}
-	if err := jobBallancer.TerminateTakeJob(); err != nil {
-		t.Errorf("error: terminate job failed " + err.Error())
-	}
+	jobBallancer.PushJob("is error", "dataToDispatchSuccess", "dataToDispatchError")
+	time.Sleep(time.Second * 4)
+	jobBallancer.TerminateTakeJob()
 
 }
 
+/*
 func TestJobBallancerNowait(t *testing.T) {
 	testJobDispatcher := TestJobDispatcher{}
 	testErrorDispatcher := TestErrorDispatcher{}
@@ -74,7 +65,7 @@ func TestJobBallancerNowait(t *testing.T) {
 		t.Errorf("error: terminate job failed " + err.Error())
 	}
 }
-
+*/
 func TestDicomClient(t *testing.T) {
 	/*DCOMClient:=DCOMClient{
 			Address :

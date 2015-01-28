@@ -6,6 +6,11 @@ import "strconv"
 import "log"
 import "encoding/json"
 
+type HttpResReq struct {
+	ResponseWriter http.ResponseWriter
+	Request        *http.Request
+}
+
 //main service class
 type DicomJsonService struct {
 	jobBallancer *JobBallancer
@@ -38,7 +43,8 @@ func (service *DicomJsonService) cEcho(responseWriter http.ResponseWriter, reque
 		responseWriter.Write([]byte(strErr))
 		log.Println(strErr)
 	}
-	service.jobBallancer.PushJob(dicomCEchoRequest, nil, nil)
+	httpResReq := HttpResReq{Request: request, ResponseWriter: responseWriter}
+	service.jobBallancer.PushJob(dicomCEchoRequest, httpResReq, httpResReq)
 
 }
 
