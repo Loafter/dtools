@@ -1,0 +1,9 @@
+/* File : example.i */
+%module gdcmgobr
+
+%{
+#include "gdcmgobr.h"
+%}
+
+/* Let's just grab the original header file here */
+%include "gdcmgobr.h"
