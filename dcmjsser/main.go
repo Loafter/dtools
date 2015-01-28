@@ -1,9 +1,10 @@
 package main
 
-import "fmt"
+import "log"
+import "dtools/gdcmgobr"
 
 func main() {
-	i := 9
-	i++
-	fmt.Println("")
+	var isOn bool
+	isOn = gdcmgobr.CEcho("pacs.chaika.com", 104, "", "")
+	log.Printf("dicom C-ECHO state is %v", isOn)
 }
