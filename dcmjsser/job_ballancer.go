@@ -25,7 +25,6 @@ type JobBallancer struct {
 	jobDispatcher       JobDispatcher
 	completedDispatcher CompletedDispatcher
 	waitJobDone         sync.WaitGroup
-	count               int
 }
 
 func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
@@ -53,7 +52,6 @@ func (jobBallancer *JobBallancer) takeJob() {
 			return
 		case Job:
 			//regular dispath
-			jobBallancer.count++
 			jobBallancer.addJob(job)
 			go jobBallancer.startJob(job)
 			log.Println("info: normal dispatch")
@@ -74,7 +72,6 @@ func (jobBallancer *JobBallancer) takeJob() {
 				log.Println("error: faled remove task with err " + job.JobId)
 			}
 			jobBallancer.waitJobDone.Done()
-			jobBallancer.count--
 		case FailedJob:
 			//notyfy about failed job
 			getJob, err := jobBallancer.getJobByID(job.JobId)
@@ -92,10 +89,8 @@ func (jobBallancer *JobBallancer) takeJob() {
 			}
 
 			jobBallancer.waitJobDone.Done()
-			jobBallancer.count--
 		default:
 			log.Println("error: unknown job type")
-			jobBallancer.count--
 			jobBallancer.waitJobDone.Done()
 		}
 	}
