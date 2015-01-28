@@ -3,21 +3,27 @@ package main
 import "log"
 import "errors"
 import "sync"
+import "crypto/rand"
+import "fmt"
 
 type JobDispatcher interface {
-	Dispatch(interface{}) (error, interface{})
+	Dispatch(interface{}) (interface{}, error)
 }
 
 type ErrorDispatcher interface {
-	DispatchError(*FailedJob) error
+	DispatchError(*FailedJob, interface{}) error
 }
 
+type CompletedDispatcher interface {
+	DispatchSuccess(*CompletedJob, interface{}) error
+}
 type JobBallancer struct {
-	inJobChan       chan interface{}
-	activeJob       map[string]interface{}
-	errorDispatcher ErrorDispatcher
-	jobDispatcher   JobDispatcher
-	waitJobDone     sync.WaitGroup
+	inJobChan           chan interface{}
+	activeJob           map[string]Job
+	errorDispatcher     ErrorDispatcher
+	jobDispatcher       JobDispatcher
+	completedDispatcher CompletedDispatcher
+	waitJobDone         sync.WaitGroup
 }
 
 func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
@@ -43,16 +49,22 @@ func (jobBallancer *JobBallancer) takeJob() {
 		case Job:
 			//regular dispath
 			jobBallancer.waitJobDone.Add(1)
-			jobBallancer.addJob(job.JobId, job.JobData)
+			jobBallancer.addJob(job)
 			go jobBallancer.startJob(job)
 			log.Println("info: normal dispatch")
-		case DoneJob:
+		case CompletedJob:
 			log.Println("info: try remove task id=" + job.JobId)
 			err := jobBallancer.removeJob(job.JobId)
 			if err == nil {
 				log.Println("info: successul remove task id=" + job.JobId)
 			} else {
 				log.Println("error: faled remove task with err " + job.JobId)
+			}
+			getJob, err := jobBallancer.getJobByID(job.JobId)
+			if err == nil {
+				jobBallancer.completedDispatcher.DispatchSuccess(&job, getJob)
+			} else {
+				log.Println("error: failed dispatch success" + job.JobId)
 			}
 			jobBallancer.waitJobDone.Done()
 		case FailedJob:
@@ -62,8 +74,14 @@ func (jobBallancer *JobBallancer) takeJob() {
 			} else {
 				log.Println("error: faled remove failed task id=" + job.JobId)
 			}
-			jobBallancer.errorDispatcher.DispatchError(&job)
+			getJob, err := jobBallancer.getJobByID(job.JobId)
+			if err == nil {
+				jobBallancer.errorDispatcher.DispatchError(&job, getJob)
+			} else {
+				log.Println("error: failef dispatch error" + job.JobId)
+			}
 			jobBallancer.waitJobDone.Done()
+
 		default:
 			log.Println("error: unknown job type")
 		}
@@ -80,18 +98,27 @@ func (jobBallancer *JobBallancer) removeJob(jobId string) error {
 	return nil
 }
 
+//remove successul complited job
+func (jobBallancer *JobBallancer) getJobByID(jobId string) (*Job, error) {
+	if val, isFind := jobBallancer.activeJob[jobId]; isFind {
+		return &val, nil
+	} else {
+		return nil, errors.New("error: can't find job with id")
+	}
+}
+
 //add job
-func (jobBallancer *JobBallancer) addJob(id string, job interface{}) error {
+func (jobBallancer *JobBallancer) addJob(job Job) error {
 	if jobBallancer.activeJob == nil {
 		return errors.New("error: job list is null")
 	}
-	jobBallancer.activeJob[id] = job
+	jobBallancer.activeJob[job.JobId] = job
 	return nil
 }
 
 //check if work confilct
 func (jobBallancer *JobBallancer) isConflictedJob(taskData interface{}) bool {
-	if _, ok := taskData.(IsVerifiable); !ok {
+	/*if _, ok := taskData.(IsVerifiable); !ok {
 		errors.New("warning: this task date is not verifiable")
 		return false
 	}
@@ -101,15 +128,15 @@ func (jobBallancer *JobBallancer) isConflictedJob(taskData interface{}) bool {
 				return true
 			}
 		}
-	}
+	}*/
 	return false
 }
 
-func (jobBallancer *JobBallancer) PushJob(job Job) error {
+func (jobBallancer *JobBallancer) PushJob(jobData Job, dataToDispatchSuccess interface{}, dataToDispatchError interface{}) error {
 	if jobBallancer.inJobChan == nil {
 		return errors.New("error: JobChan is not inited")
 	}
-	jobBallancer.inJobChan <- job
+	jobBallancer.inJobChan <- Job{JobId: genUid(), Data: jobData}
 	return nil
 }
 
@@ -129,10 +156,17 @@ func (jobBallancer *JobBallancer) TerminateTakeJob() error {
 	return nil
 }
 
-func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, errorDispatcher ErrorDispatcher) {
+func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, errorDispatcher ErrorDispatcher, completedDispatcher CompletedDispatcher) {
 	jobBallancer.errorDispatcher = errorDispatcher
 	jobBallancer.jobDispatcher = jobDispatcher
-	jobBallancer.activeJob = make(map[string]interface{})
+	jobBallancer.completedDispatcher = completedDispatcher
+	jobBallancer.activeJob = make(map[string]Job)
 	jobBallancer.inJobChan = make(chan interface{})
 	go jobBallancer.takeJob()
+}
+
+func genUid() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }

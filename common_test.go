@@ -8,31 +8,30 @@ import "time"
 type TestJobDispatcher struct {
 }
 
-type TestErrorDispatcher struct {
-}
-
 func DispatchTh(jobd interface{}, resultChan chan interface{}) {
 
 }
 
-func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}) (error, interface{}) {
-	job := jobd.(Job)
-
-	if job.JobId == "erroid" {
-		time.Sleep(time.Second * 2)
-		return nil, FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}
-	} else if job.JobId == "workid" {
-		time.Sleep(time.Second * 1)
-		return nil, DoneJob{JobId: "workid"}
-	} else {
-		return nil, FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}
-	}
-	return errors.New(""), nil
+type TestErrorDispatcher struct {
 }
 
 func (testErrorDispatcher *TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
 	log.Print("success dispatch error")
 	return nil
+}
+
+func (testJobDispatcher *TestJobDispatcher) Dispatch(jobd interface{}) (interface{}, error) {
+	job := jobd.(Job)
+	if job.JobId == "erroid" {
+		time.Sleep(time.Second * 2)
+		return FailedJob{JobId: "erroid", ErrorData: errors.New("generated error")}, nil
+	} else if job.JobId == "workid" {
+		time.Sleep(time.Second * 1)
+		return DoneJob{JobId: "workid"}, nil
+	} else {
+		return FailedJob{JobId: job.JobId, ErrorData: errors.New("generated error")}, nil
+	}
+	return errors.New(""), nil
 }
 
 func TestJobBallancer(t *testing.T) {
