@@ -25,7 +25,7 @@ func (service *DicomJsonService) Start(listenPort int) error {
 	if err := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil); err != nil {
 		return errors.New("error: can't start listen http server")
 	}
-	service.jobBallancer.Init(&service.dicomDispatcher, nil, nil)
+	service.jobBallancer.Init(&service.dicomDispatcher, new(OnCompletedResp), new(OnErrorResp))
 	return nil
 }
 

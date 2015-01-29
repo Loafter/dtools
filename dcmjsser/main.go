@@ -1,10 +1,12 @@
 package main
 
 import "log"
-import "dtools/gdcmgobr"
+
+//import "dtools/gdcmgobr"
 
 func main() {
-	var isOn bool
-	isOn = gdcmgobr.CEcho("pacs.chaika.com", 104, "", "")
-	log.Printf("dicom C-ECHO state is %v", isOn)
+	dicomJsonService := DicomJsonService{}
+	if err := dicomJsonService.Start(9978); err != nil {
+		log.Println(err)
+	}
 }

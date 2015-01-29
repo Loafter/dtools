@@ -29,7 +29,7 @@ type TestErrorDispatcher struct {
 }
 
 func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob, data interface{}) error {
-	log.Printf("info: DispatchError job %v job data %v \n", failedJob, data)
+	log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob, data)
 	return nil
 }
 
@@ -46,7 +46,7 @@ func TestJobBallancer(t *testing.T) {
 	testErrorDispatcher := TestErrorDispatcher{}
 	testSuccessDispatcher := TestCompletedDispatcher{}
 	jobBallancer := JobBallancer{}
-	jobBallancer.Init(&testJobDispatcher, &testErrorDispatcher, &testSuccessDispatcher)
+	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
 	for i := 0; i < 10; i++ {
 		jobBallancer.PushJob("is error"+strconv.Itoa(i), "dataToDispatchSuccess", "dataToDispatchError")
 	}

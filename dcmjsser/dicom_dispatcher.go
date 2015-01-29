@@ -14,6 +14,5 @@ func (dispatcher *DicomDispatcher) Dispatch(dicomRequest interface{}) (interface
 	case DicomCFindRequest:
 		dispatcher.dcomClient.CFind(typedRequest)
 	}
-
 	return nil, errors.New("error: can't dispatch non dicom request type")
 }

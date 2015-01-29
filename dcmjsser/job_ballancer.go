@@ -160,12 +160,11 @@ func (jobBallancer *JobBallancer) TerminateTakeJob() error {
 	if len(jobBallancer.activeJob) > 0 {
 		return errors.New("error: list job is not empty")
 	}
-
 	log.Println("info: greacefully terminate take job")
 	return nil
 }
 
-func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, errorDispatcher ErrorDispatcher, completedDispatcher CompletedDispatcher) {
+func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, completedDispatcher CompletedDispatcher, errorDispatcher ErrorDispatcher) {
 	jobBallancer.errorDispatcher = errorDispatcher
 	jobBallancer.jobDispatcher = jobDispatcher
 	jobBallancer.completedDispatcher = completedDispatcher
