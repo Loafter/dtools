@@ -15,15 +15,13 @@ type Job struct {
 }
 
 type FailedJob struct {
-	JobId       string
-	ErrorData   interface{}
-	DataToError interface{}
+	Job       Job
+	ErrorData interface{}
 }
 
 type CompletedJob struct {
-	JobId         string
-	ResultData    interface{}
-	DataToSuccess interface{}
+	Job        Job
+	ResultData interface{}
 }
 
 type TerminateDispatchJob struct {

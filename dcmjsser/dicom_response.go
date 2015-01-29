@@ -1,15 +1,22 @@
 package main
 
-import "net/http"
-import "encoding/json"
+//import "net/http"
+//import "encoding/json"
 import "log"
-import "errors"
+
+//import "errors"
 
 type OnErrorResp struct {
+	responses map[string]HttpResReq
+}
+
+func (onErrorResp *OnErrorResp) Init(responses map[string]HttpResReq) {
+	onErrorResp.responses = responses
 }
 
 func (*OnErrorResp) DispatchError(failedJob *FailedJob) error {
-	httpResReq, isType := failedJob.DataToError.(HttpResReq)
+	log.Println("info: DispatchError")
+	/*httpResReq, isType := failedJob.DataToError.(HttpResReq)
 	if !isType {
 		return errors.New("error: http responce and responce writer corrupted")
 	}
@@ -23,15 +30,19 @@ func (*OnErrorResp) DispatchError(failedJob *FailedJob) error {
 		return errors.New(stErr)
 	}
 	httpResReq.ResponseWriter.Header().Set("Content-Type", "application/json")
-	httpResReq.ResponseWriter.Write(js)
+	httpResReq.ResponseWriter.Write(js)*/
 	return nil
 }
 
 type OnCompletedResp struct {
+	responses map[string]HttpResReq
 }
 
+func (onCompletedResp *OnCompletedResp) Init(responses map[string]HttpResReq) {
+	onCompletedResp.responses = responses
+}
 func (*OnCompletedResp) DispatchSuccess(completedJob *CompletedJob) error {
-	httpResReq, isType := completedJob.DataToSuccess.(HttpResReq)
+	/*httpResReq, isType := completedJob.DataToSuccess.(HttpResReq)
 	if !isType {
 		return errors.New("error: http responce and responce writer corrupted")
 	}
@@ -45,6 +56,6 @@ func (*OnCompletedResp) DispatchSuccess(completedJob *CompletedJob) error {
 		return errors.New(stErr)
 	}
 	httpResReq.ResponseWriter.Header().Set("Content-Type", "application/json")
-	httpResReq.ResponseWriter.Write(js)
+	httpResReq.ResponseWriter.Write(js)*/
 	return nil
 }

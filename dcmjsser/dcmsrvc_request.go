@@ -6,7 +6,7 @@ import "errors"
 // common dicom requests
 type DicomCEchoRequest struct {
 	Address        string `json:"Address"`
-	Port           uint16 `json:"Port"`
+	Port           uint16 `json:"Port,string"`
 	ServerAE_Title string `json:"ServerAE_Title"`
 }
 

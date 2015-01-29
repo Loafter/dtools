@@ -32,10 +32,10 @@ func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
 	dispResult, err := jobBallancer.jobDispatcher.Dispatch(jobd)
 	if err != nil {
 		log.Println("info: failed job detected")
-		jobBallancer.inJobChan <- FailedJob{JobId: job.JobId, ErrorData: err}
+		jobBallancer.inJobChan <- FailedJob{Job: job, ErrorData: err}
 	} else {
 		log.Println("info: compleated job detected")
-		jobBallancer.inJobChan <- CompletedJob{JobId: job.JobId, ResultData: dispResult}
+		jobBallancer.inJobChan <- CompletedJob{Job: job, ResultData: dispResult}
 	}
 
 }
@@ -58,18 +58,18 @@ func (jobBallancer *JobBallancer) takeJob() {
 		case CompletedJob:
 			//notify about sucess
 			if err := jobBallancer.completedDispatcher.DispatchSuccess(&job); err != nil {
-				log.Println("error: failed dispatch success" + job.JobId)
+				log.Println("error: failed dispatch success" + job.Job.JobId)
 			}
 			//remove success compleated job
-			jobBallancer.removeJob(job.JobId)
+			jobBallancer.removeJob(job.Job.JobId)
 			jobBallancer.waitJobDone.Done()
 		case FailedJob:
 			//notify about sucess
 			if err := jobBallancer.errorDispatcher.DispatchError(&job); err != nil {
-				log.Println("error: failed dispatch success" + job.JobId)
+				log.Println("error: failed dispatch error" + job.Job.JobId)
 			}
 			//remove success compleated job
-			jobBallancer.removeJob(job.JobId)
+			jobBallancer.removeJob(job.Job.JobId)
 			jobBallancer.waitJobDone.Done()
 		default:
 			log.Println("error: unknown job type")
@@ -154,6 +154,7 @@ func (jobBallancer *JobBallancer) Init(jobDispatcher JobDispatcher, completedDis
 	jobBallancer.activeJob = make(map[string]Job)
 	jobBallancer.inJobChan = make(chan interface{})
 	go jobBallancer.takeJob()
+	log.Println("info: job ballancer inited")
 }
 
 func genUid() string {

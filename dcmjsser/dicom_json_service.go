@@ -25,13 +25,17 @@ type DicomJsonService struct {
 
 //start and init service
 func (service *DicomJsonService) Start(listenPort int) error {
+	service.responses = make(map[string]HttpResReq)
+	onCompletedResp := new(OnCompletedResp)
+	onCompletedResp.Init(service.responses)
+	onErrorResp := new(OnErrorResp)
+	onErrorResp.Init(service.responses)
+	service.jobBallancer.Init(&service.dicomDispatcher, onCompletedResp, onErrorResp)
 	http.HandleFunc("/c-echo", service.cEcho)
 	http.HandleFunc("/index.html", service.ServePage)
 	if err := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil); err != nil {
 		return errors.New("error: can't start listen http server")
 	}
-	service.jobBallancer.Init(&service.dicomDispatcher, new(OnCompletedResp), new(OnErrorResp))
-	service.responses = make(map[string]HttpResReq)
 	return nil
 }
 
@@ -41,21 +45,23 @@ func (service *DicomJsonService) cEcho(responseWriter http.ResponseWriter, reque
 	bodyData, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		strErr := "error: Can't read http body data"
-		responseWriter.Write([]byte(strErr))
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		log.Println(strErr)
 		return
 	}
 	var dicomCEchoRequest DicomCEchoRequest
 	if err := json.Unmarshal(bodyData, &dicomCEchoRequest); err != nil {
 		strErr := "error: can't parse DicomCEchoRequest data"
-		responseWriter.Write([]byte(strErr))
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		log.Println(strErr)
+		return
 	}
 
 	if guid, err := service.jobBallancer.PushJob(dicomCEchoRequest); err == nil {
 		service.responses[guid] = HttpResReq{Request: request, ResponseWriter: responseWriter}
 	} else {
 		log.Printf("error: can't push job")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
 
 }
