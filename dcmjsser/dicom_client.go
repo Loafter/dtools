@@ -14,7 +14,6 @@ func (dcomClient *DCOMClient) checRequisites() error {
 }
 
 func (dcomClient *DCOMClient) CStore() error {
-
 	return nil
 }
 
@@ -31,7 +30,6 @@ func (dcomClient *DCOMClient) CFind(dicomCFindRequest DicomCFindRequest) error {
 		if err := dcomClient.checRequisites(); err != nil {
 			return err
 		}
-		//to do: write gdcm call
 		return nil
 	}
 
