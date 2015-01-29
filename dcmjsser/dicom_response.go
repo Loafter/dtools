@@ -8,7 +8,7 @@ import "errors"
 type OnErrorResp struct {
 }
 
-func (*OnErrorResp) DispatchError(failedJob *FailedJob, data interface{}) error {
+func (*OnErrorResp) DispatchError(failedJob *FailedJob) error {
 	httpResReq, isType := failedJob.DataToError.(HttpResReq)
 	if !isType {
 		return errors.New("error: http responce and responce writer corrupted")
@@ -30,7 +30,7 @@ func (*OnErrorResp) DispatchError(failedJob *FailedJob, data interface{}) error 
 type OnCompletedResp struct {
 }
 
-func (*OnCompletedResp) DispatchSuccess(completedJob *CompletedJob, data interface{}) error {
+func (*OnCompletedResp) DispatchSuccess(completedJob *CompletedJob) error {
 	httpResReq, isType := completedJob.DataToSuccess.(HttpResReq)
 	if !isType {
 		return errors.New("error: http responce and responce writer corrupted")

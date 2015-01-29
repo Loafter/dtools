@@ -28,16 +28,16 @@ func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
 type TestErrorDispatcher struct {
 }
 
-func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob, data interface{}) error {
-	log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob, data)
+func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
+	log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
 	return nil
 }
 
 type TestCompletedDispatcher struct {
 }
 
-func (*TestCompletedDispatcher) DispatchSuccess(completedJob *CompletedJob, data interface{}) error {
-	log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob, data)
+func (*TestCompletedDispatcher) DispatchSuccess(completedJob *CompletedJob) error {
+	log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
 	return nil
 }
 
@@ -48,7 +48,7 @@ func TestJobBallancer(t *testing.T) {
 	jobBallancer := JobBallancer{}
 	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
 	for i := 0; i < 10; i++ {
-		jobBallancer.PushJob("is error"+strconv.Itoa(i), "dataToDispatchSuccess", "dataToDispatchError")
+		jobBallancer.PushJob("is error" + strconv.Itoa(i))
 	}
 
 	jobBallancer.TerminateTakeJob()

@@ -10,10 +10,8 @@ type IsVerifiable interface {
 	IsConflict(IsVerifiable) bool
 }
 type Job struct {
-	JobId         string
-	Data          interface{}
-	DataToSuccess interface{}
-	DataToError   interface{}
+	JobId string
+	Data  interface{}
 }
 
 type FailedJob struct {
