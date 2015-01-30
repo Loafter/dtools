@@ -33,6 +33,6 @@ func (dcomClient *DCOMClient) CEcho(dicomCEchoRequest DicomCEchoRequest) (interf
 		return nil, err
 	}
 	dicomCEchoResult := DicomCEchoResult{}
-	dicomCEchoResult.IsAlive = true
+	dicomCEchoResult.IsAlive = false
 	return dicomCEchoResult, nil
 }

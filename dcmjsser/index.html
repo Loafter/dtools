@@ -1,222 +1,233 @@
-
 <!doctype html>
-
 <html>
 
-  <head>
-    <title>Justified Nav</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <style type="text/css">
-      body {
-        padding-top: 20px;
-      }
-      .footer {
-        border-top: 1px solid #eee;
-        margin-top: 40px;
-        padding-top: 40px;
-        padding-bottom: 40px;
-      }
-      /* Main marketing message and sign up button */
-      .jumbotron {
-        text-align: center;
-        background-color: transparent;
-      }
-      .jumbotron .btn {
-        font-size: 21px;
-        padding: 14px 24px;
-      }
-      /* Customize the nav-justified links to be fill the entire space of the .navbar */
-      .nav-justified {
-        background-color: #eee;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-      }
-      .nav-justified > li > a {
-        padding-top: 15px;
-        padding-bottom: 15px;
-        color: #777;
-        font-weight: bold;
-        text-align: center;
-        border-bottom: 1px solid #d5d5d5;
-        background-color: #e5e5e5;
-        /* Old browsers */
-        background-repeat: repeat-x;
-        /* Repeat the gradient */
-        background-image: -moz-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
-        /* FF3.6+ */
-        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #e5e5e5));
-        /* Chrome,Safari4+ */
-        background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
-        /* Chrome 10+,Safari 5.1+ */
-        background-image: -ms-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
-        /* IE10+ */
-        background-image: -o-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
-        /* Opera 11.10+ */
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#e5e5e5', GradientType=0);
-        /* IE6-9 */
-        background-image: linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
-        /* W3C */
-      }
-      .nav-justified > .active > a, .nav-justified > .active > a:hover, .nav-justified > .active > a:focus {
-        background-color: #ddd;
-        background-image: none;
-        box-shadow: inset 0 3px 7px rgba(0, 0, 0, .15);
-      }
-      .nav-justified > li:first-child > a {
-        border-radius: 5px 5px 0 0;
-      }
-      .nav-justified > li:last-child > a {
-        border-bottom: 0;
-        border-radius: 0 0 5px 5px;
-      }
-      @media(min-width: 768px) {
-        .nav-justified {
-          max-height: 52px;
-        }
-        .nav-justified > li > a {
-          border-left: 1px solid #fff;
-          border-right: 1px solid #d5d5d5;
-        }
-        .nav-justified > li:first-child > a {
-          border-left: 0;
-          border-radius: 5px 0 0 5px;
-        }
-        .nav-justified > li:last-child > a {
-          border-radius: 0 5px 5px 0;
-          border-right: 0;
-        }
-      }
-      /* Responsive: Portrait tablets and up */
-      @media screen and(min-width: 768px) {
-        /* Remove the padding we set earlier */
-        .masthead, .marketing, .footer {
-          padding-left: 0;
-          padding-right: 0;
-        }
-      }
-    </style>
+<head>
+	<title>Justified Nav</title>
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<style type="text/css">
+		body {
+			padding-top: 20px;
+		}
+		.footer {
+			border-top: 1px solid #eee;
+			margin-top: 40px;
+			padding-top: 40px;
+			padding-bottom: 40px;
+		}
+		/* Main marketing message and sign up button */
+
+		.jumbotron {
+			text-align: center;
+			background-color: transparent;
+		}
+		.jumbotron .btn {
+			font-size: 21px;
+			padding: 14px 24px;
+		}
+		/* Customize the nav-justified links to be fill the entire space of the .navbar */
+
+		.nav-justified {
+			background-color: #eee;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+		}
+		.nav-justified > li > a {
+			padding-top: 15px;
+			padding-bottom: 15px;
+			color: #777;
+			font-weight: bold;
+			text-align: center;
+			border-bottom: 1px solid #d5d5d5;
+			background-color: #e5e5e5;
+			/* Old browsers */
+
+			background-repeat: repeat-x;
+			/* Repeat the gradient */
+
+			background-image: -moz-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
+			/* FF3.6+ */
+
+			background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #e5e5e5));
+			/* Chrome,Safari4+ */
+
+			background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
+			/* Chrome 10+,Safari 5.1+ */
+
+			background-image: -ms-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
+			/* IE10+ */
+
+			background-image: -o-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
+			/* Opera 11.10+ */
+
+			filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#e5e5e5', GradientType=0);
+			/* IE6-9 */
+
+			background-image: linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
+			/* W3C */
+		}
+		.nav-justified > .active > a,
+		.nav-justified > .active > a:hover,
+		.nav-justified > .active > a:focus {
+			background-color: #ddd;
+			background-image: none;
+			box-shadow: inset 0 3px 7px rgba(0, 0, 0, .15);
+		}
+		.nav-justified > li:first-child > a {
+			border-radius: 5px 5px 0 0;
+		}
+		.nav-justified > li:last-child > a {
+			border-bottom: 0;
+			border-radius: 0 0 5px 5px;
+		}
+		@media(min-width: 768px) {
+			.nav-justified {
+				max-height: 52px;
+			}
+			.nav-justified > li > a {
+				border-left: 1px solid #fff;
+				border-right: 1px solid #d5d5d5;
+			}
+			.nav-justified > li:first-child > a {
+				border-left: 0;
+				border-radius: 5px 0 0 5px;
+			}
+			.nav-justified > li:last-child > a {
+				border-radius: 0 5px 5px 0;
+				border-right: 0;
+			}
+		}
+		/* Responsive: Portrait tablets and up */
+
+		@media screen and(min-width: 768px) {
+			/* Remove the padding we set earlier */
+
+			.masthead,
+			.marketing,
+			.footer {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
+	</style>
 	<script type="text/javascript">
+		function updateCEchoSt() {
+			var cEChoReq = {
+				Address: $("#address-id").val(),
+				Port: $("#port-id").val(),
+				ServerAE_Title: $("#aetitle-id").val()
+			};
+			$.ajax({
+				url: "/c-echo",
+				type: "POST",
+				data: JSON.stringify(cEChoReq),
+				dataType: "json"
+			}).done(function(jsonData) {
+				console.log(jsonData)
+				if (jsonData.IsAlive) {
+					$("#pacs-status-id").text("ok")
+				} else {
+					$("#pacs-status-id").text("no connection")
+				}
 
+			})
+		}
 
-	function updateCEchoSt() {
-		var cEChoReq = {
-        		   Address: $("#address-id").val(),
-        		   Port: $("#port-id").val(),
-			   ServerAE_Title: $("#aetitle-id").val()
-    			   };
-		       $.ajax({
-                url: "/c-echo",
-                type: "POST",
-                data:JSON.stringify(cEChoReq),
-                dataType: "json"
-            }).done(function(jsonData) {
- 			console.log(jsonData)
-            })
+		function OnLoad() {
+			setInterval(updateCEchoSt, 400)
 		}
 	</script>
-  </head>
+</head>
 
-  <body>
-    <div class="container">
-      <div class="well">
-        <div class="panel-footer">DICOM Server settings
-        </div>
-        <table class="table table-bordered table-condensed table-hover table-striped">
-          <tbody>
-            <tr>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">DICOM server address</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm" id="address-id">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">AE-Title</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm" id="aetitle-id">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Port number</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm" id="port-id">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">DICOM ping status:</label>
-                  <p>
-                    <label class="control-label">OK</label></p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="panel-footer">Search Settings
-        </div>
-        <table class="table table-bordered table-condensed table-hover table-striped">
-          <tbody>
-            <tr>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Patient name</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Patient MRN</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Study ID</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Date of birth</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <label class="control-label">Study date</label>
-                  <div class="controls">
-                    <input type="text" class="form-control input-sm">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="form-group">
-                  <p></p>
-                  <a onclick="updateCEchoSt()" class="btn btn-success">F I N D</a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </body>
+<body onload="OnLoad()">
+	<div class="container">
+		<div class="well">
+			<div class="panel-footer">DICOM Server settings </div>
+			<table class="table table-bordered table-condensed table-hover table-striped">
+				<tbody>
+					<tr>
+						<td>
+							<div class="form-group">
+								<label class="control-label">DICOM server address</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="address-id"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">AE-Title</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="aetitle-id"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Port number</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="port-id"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">DICOM ping status:</label>
+								<p>
+									<label class="control-label" id="pacs-status-id">OK</label>
+								</p>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="panel-footer">Search Settings </div>
+			<table class="table table-bordered table-condensed table-hover table-striped">
+				<tbody>
+					<tr>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Patient name</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Patient MRN</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Study ID</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Date of birth</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Study date</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								<p></p> <a onclick="updateCEchoSt()" class="btn btn-success">F I N D</a> </div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
 
 </html>

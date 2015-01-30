@@ -80,22 +80,6 @@ func (service *DicomJsonService) ServePage(responseWriter http.ResponseWriter, r
 
 func (service *DicomJsonService) DispatchError(failedJob FailedJob) error {
 	log.Println("info: DispatchError")
-
-	/*httpResReq, isType := failedJob.DataToError.(HttpResReq)
-	if !isType {
-		return errors.New("error: http responce and responce writer corrupted")
-	}
-
-	js, err := json.Marshal(failedJob.ErrorData)
-	if err != nil {
-		http.Error(httpResReq.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		stErr := "error: Can't create system error response"
-		log.Println(stErr)
-		httpResReq.ResponseWriter.Write(js)
-		return errors.New(stErr)
-	}
-	httpResReq.ResponseWriter.Header().Set("Content-Type", "application/json")
-	httpResReq.ResponseWriter.Write(js)*/
 	return nil
 }
 
