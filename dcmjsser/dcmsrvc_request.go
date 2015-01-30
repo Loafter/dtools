@@ -30,6 +30,10 @@ type DicomCFindRequest struct {
 	StudyDate         string `json:"StudyDate"`
 }
 
+type DicomCEchoResult struct {
+	IsAlive bool `json:"IsAlive"`
+}
+
 func (dicomCFindRequest *DicomCFindRequest) InitFromJsonData(data []byte) error {
 	err := json.Unmarshal(data, &dicomCFindRequest)
 	if err != nil {

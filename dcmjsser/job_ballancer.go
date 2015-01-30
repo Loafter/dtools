@@ -11,11 +11,11 @@ type JobDispatcher interface {
 }
 
 type ErrorDispatcher interface {
-	DispatchError(*FailedJob) error
+	DispatchError(FailedJob) error
 }
 
 type CompletedDispatcher interface {
-	DispatchSuccess(*CompletedJob) error
+	DispatchSuccess(CompletedJob) error
 }
 
 type JobBallancer struct {
@@ -29,12 +29,12 @@ type JobBallancer struct {
 
 func (jobBallancer *JobBallancer) startJob(jobd interface{}) {
 	job := jobd.(Job)
-	dispResult, err := jobBallancer.jobDispatcher.Dispatch(jobd)
+	dispResult, err := jobBallancer.jobDispatcher.Dispatch(job.Data)
 	if err != nil {
 		log.Println("info: failed job detected")
 		jobBallancer.inJobChan <- FailedJob{Job: job, ErrorData: err}
 	} else {
-		log.Println("info: compleated job detected")
+		log.Printf("info: compleated job detected %v", dispResult)
 		jobBallancer.inJobChan <- CompletedJob{Job: job, ResultData: dispResult}
 	}
 
@@ -57,7 +57,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 			log.Println("info: normal dispatch")
 		case CompletedJob:
 			//notify about sucess
-			if err := jobBallancer.completedDispatcher.DispatchSuccess(&job); err != nil {
+			if err := jobBallancer.completedDispatcher.DispatchSuccess(job); err != nil {
 				log.Println("error: failed dispatch success" + job.Job.JobId)
 			}
 			//remove success compleated job
@@ -65,7 +65,7 @@ func (jobBallancer *JobBallancer) takeJob() {
 			jobBallancer.waitJobDone.Done()
 		case FailedJob:
 			//notify about sucess
-			if err := jobBallancer.errorDispatcher.DispatchError(&job); err != nil {
+			if err := jobBallancer.errorDispatcher.DispatchError(job); err != nil {
 				log.Println("error: failed dispatch error" + job.Job.JobId)
 			}
 			//remove success compleated job

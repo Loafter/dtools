@@ -25,19 +25,14 @@ func (dcomClient *DCOMClient) CMove() error {
 	return nil
 }
 
-func (dcomClient *DCOMClient) CFind(dicomCFindRequest DicomCFindRequest) error {
-	{
-		if err := dcomClient.checRequisites(); err != nil {
-			return err
-		}
-		return nil
-	}
-
+func (dcomClient *DCOMClient) CFind(dicomCFindRequest DicomCFindRequest) (interface{}, error) {
+	return "", nil
 }
 func (dcomClient *DCOMClient) CEcho(dicomCEchoRequest DicomCEchoRequest) (interface{}, error) {
 	if err := dcomClient.checRequisites(); err != nil {
-		return "", err
+		return nil, err
 	}
-	//to do: write gdcm call
-	return "", nil
+	dicomCEchoResult := DicomCEchoResult{}
+	dicomCEchoResult.IsAlive = true
+	return dicomCEchoResult, nil
 }

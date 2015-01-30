@@ -28,7 +28,7 @@ func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
 type TestErrorDispatcher struct {
 }
 
-func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
+func (*TestErrorDispatcher) DispatchError(failedJob FailedJob) error {
 	log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
 	return nil
 }
@@ -36,7 +36,7 @@ func (*TestErrorDispatcher) DispatchError(failedJob *FailedJob) error {
 type TestCompletedDispatcher struct {
 }
 
-func (*TestCompletedDispatcher) DispatchSuccess(completedJob *CompletedJob) error {
+func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompletedJob) error {
 	log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
 	return nil
 }

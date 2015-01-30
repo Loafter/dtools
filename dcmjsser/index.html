@@ -2,7 +2,7 @@
 <!doctype html>
 
 <html>
-  
+
   <head>
     <title>Justified Nav</title>
     <meta name="viewport" content="width=device-width">
@@ -99,10 +99,10 @@
       }
     </style>
 	<script type="text/javascript">
-	
-	
+
+
 	function updateCEchoSt() {
-		var cEChoReq = {				
+		var cEChoReq = {
         		   Address: $("#address-id").val(),
         		   Port: $("#port-id").val(),
 			   ServerAE_Title: $("#aetitle-id").val()
@@ -113,12 +113,12 @@
                 data:JSON.stringify(cEChoReq),
                 dataType: "json"
             }).done(function(jsonData) {
- 
+ 			console.log(jsonData)
             })
 		}
 	</script>
   </head>
-  
+
   <body>
     <div class="container">
       <div class="well">
