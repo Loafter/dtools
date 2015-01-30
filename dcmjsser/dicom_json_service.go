@@ -53,16 +53,15 @@ func (service *DicomJsonService) cEcho(responseWriter http.ResponseWriter, reque
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 
-	} else {
-		js, err := json.Marshal(service.remoteSCPState)
-		if err != nil {
-			log.Printf("error: can't serialize job")
-			http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		responseWriter.Write(js)
 	}
 
+	js, err := json.Marshal(service.remoteSCPState)
+	if err != nil {
+		log.Printf("error: can't serialize servise state")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	responseWriter.Write(js)
 }
 
 //serve main page request

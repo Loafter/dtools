@@ -128,15 +128,22 @@
 				console.log(jsonData)
 				if (jsonData.IsAlive) {
 					$("#pacs-status-id").text("ok")
+					$("#search-panel").fadeIn("slow");
+					$("#search-footer").fadeIn("slow");
+					
 				} else {
 					$("#pacs-status-id").text("no connection")
+					$("#search-panel").fadeOut("slow");
+					$("#search-footer").fadeOut("slow");
 				}
 
 			})
 		}
 
 		function OnLoad() {
-			setInterval(updateCEchoSt, 400)
+			$("#search-panel").fadeOut("slow");
+			$("#search-footer").fadeOut("slow");
+			setInterval(updateCEchoSt, 700)
 		}
 	</script>
 </head>
@@ -180,8 +187,8 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="panel-footer">Search Settings </div>
-			<table class="table table-bordered table-condensed table-hover table-striped">
+			<div class="panel-footer" id="search-footer">Search Settings </div>
+			<table id="search-panel" class="table table-bordered table-condensed table-hover table-striped">
 				<tbody>
 					<tr>
 						<td>

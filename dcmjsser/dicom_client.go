@@ -1,6 +1,7 @@
 package main
 
 import "errors"
+import "dtools/gdcmgobr"
 
 type DCOMClient struct {
 	CallerAE_Title string
@@ -32,7 +33,7 @@ func (dcomClient *DCOMClient) CEcho(dicomCEchoRequest DicomCEchoRequest) (interf
 	if err := dcomClient.checRequisites(); err != nil {
 		return nil, err
 	}
-	dicomCEchoResult := DicomCEchoResult{}
-	dicomCEchoResult.IsAlive = false
+	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dicomCEchoRequest.ServerAE_Title, dcomClient.CallerAE_Title)
+	dicomCEchoResult := DicomCEchoResult{IsAlive: isAlive}
 	return dicomCEchoResult, nil
 }
