@@ -29,7 +29,7 @@ type TestErrorDispatcher struct {
 }
 
 func (*TestErrorDispatcher) DispatchError(failedJob FailedJob) error {
-	log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
+	//log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
 	return nil
 }
 
@@ -37,7 +37,7 @@ type TestCompletedDispatcher struct {
 }
 
 func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompletedJob) error {
-	log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
+	//log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
 	return nil
 }
 
@@ -47,7 +47,7 @@ func TestJobBallancer(t *testing.T) {
 	testSuccessDispatcher := TestCompletedDispatcher{}
 	jobBallancer := JobBallancer{}
 	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 5; i++ {
 		jobBallancer.PushJob("is error" + strconv.Itoa(i))
 	}
 
@@ -56,10 +56,7 @@ func TestJobBallancer(t *testing.T) {
 }
 
 func TestDicomClient(t *testing.T) {
-	/*DCOMClient:=DCOMClient{
-			Address :
-	Port           uint16
-	ServerAE_Title string
-	CallerAE_Title string
-	}*/
+	dicomCEchoRequest := DicomCEchoRequest{Address: "pacs.chaika.com", Port: 104, ServerAE_Title: "GEPACS"}
+	dcomClient := DCOMClient{CallerAE_Title: "AE_DTOOLS"}
+	dcomClient.CEcho(dicomCEchoRequest)
 }

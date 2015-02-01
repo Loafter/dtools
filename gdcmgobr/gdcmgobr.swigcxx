@@ -1,9 +1,8 @@
 /* File : example.i */
-%module gdcmgobr
-
-%{
-#include "gdcmgobr.h"
-%}
-
-/* Let's just grab the original header file here */
+%module gdcmgobrg
+ %{
+ /* Includes the header in the wrapper code */
+ #include "gdcmgobr.h"
+ %}
+ /* Parse the header file to generate wrappers */
 %include "gdcmgobr.h"

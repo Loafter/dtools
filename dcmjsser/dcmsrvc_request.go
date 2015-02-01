@@ -20,9 +20,7 @@ func (dicomCEchoRequest *DicomCEchoRequest) InitFromJsonData(data []byte) error 
 }
 
 type DicomCFindRequest struct {
-	Address           string `json:"Address"`
-	Port              uint16 `json:"Port"`
-	ServerAE_Title    string `json:"ServerAE_Title"`
+	DicomCEchoRequest
 	PatientName       string `json:"PatientName"`
 	PatientMRN        string `json:"PatientMRN"`
 	StudyID           string `json:"StudyID"`
