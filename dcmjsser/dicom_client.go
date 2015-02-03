@@ -2,43 +2,43 @@ package main
 
 import "errors"
 import "dtools/gdcmgobr"
+import "encoding/json"
 
-type DCOMClient struct {
+type DicomClient struct {
 	CallerAE_Title string
 }
 
-func (dcomClient *DCOMClient) checRequisites() error {
+func (dcomClient *DicomClient) checRequisites() error {
 	if len(dcomClient.CallerAE_Title) == 0 {
 		return errors.New("error: CallerAE_Title is empty")
 	}
 	return nil
 }
 
-func (dcomClient *DCOMClient) CStore() error {
+func (dcomClient *DicomClient) CStore() error {
 	return nil
 }
 
-func (dcomClient *DCOMClient) CGet() error {
+func (dcomClient *DicomClient) CGet() error {
 	return nil
 }
 
-func (dcomClient *DCOMClient) CMove() error {
+func (dcomClient *DicomClient) CMove() error {
 	return nil
 }
 
-func (dcomClient *DCOMClient) CFind(dicomCFindRequest DicomCFindRequest) (interface{}, error) {
-	//dataSet := gdcmgobr.GenCfindResult()
-	//keys := gdcmgobr.GenCfindKeys()
-	//e := gdcmgobr.
-	//	gdcmgobr.CFind("AE_TITLE", "GE_PASC", "pacs.chaika.com", 104, keys, dataSet)
-	//datatrr := gdcmgobr.Std_vector_Sl_gdcm_DataSet_Sg_
-
-	//result := gdcmgobr.SwigcptrStd_vector_Sl_gdcm_DataSet_Sg_.Swigcptr()
-	//
-
-	return "", nil
+func (dcomClient *DicomClient) CFind(dicomCFindRequest DicomCFindRequest) (interface{}, error) {
+	cfindResult := gdcmgobr.CFind(dcomClient.CallerAE_Title, dicomCFindRequest.ServerAE_Title, dicomCFindRequest.Address,
+		dicomCFindRequest.Port, dicomCFindRequest.PatientName, dicomCFindRequest.AccessionNumber,
+		dicomCFindRequest.PatienDateOfBirth, dicomCFindRequest.StudyDate)
+	var cfindData []DicomCFindResult
+	err := json.Unmarshal([]byte(cfindResult), &cfindData)
+	if err != nil {
+		return nil, errors.New("error: Can't parse dicom cFind result data")
+	}
+	return cfindData, nil
 }
-func (dcomClient *DCOMClient) CEcho(dicomCEchoRequest DicomCEchoRequest) (DicomCEchoResult, error) {
+func (dcomClient *DicomClient) CEcho(dicomCEchoRequest DicomCEchoRequest) (DicomCEchoResult, error) {
 	if err := dcomClient.checRequisites(); err != nil {
 		return DicomCEchoResult{}, err
 	}

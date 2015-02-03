@@ -22,8 +22,7 @@ func (dicomCEchoRequest *DicomCEchoRequest) InitFromJsonData(data []byte) error 
 type DicomCFindRequest struct {
 	DicomCEchoRequest
 	PatientName       string `json:"PatientName"`
-	PatientMRN        string `json:"PatientMRN"`
-	StudyID           string `json:"StudyID"`
+	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
 	StudyDate         string `json:"StudyDate"`
 }
@@ -39,4 +38,11 @@ func (dicomCFindRequest *DicomCFindRequest) InitFromJsonData(data []byte) error 
 	}
 	return nil
 
+}
+
+type DicomCFindResult struct {
+	PatientName       string `json:"PatientName"`
+	AccessionNumber   string `json:"AccessionNumber"`
+	PatienDateOfBirth string `json:"PatienDateOfBirth"`
+	StudyDate         string `json:"StudyDate"`
 }

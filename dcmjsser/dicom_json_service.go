@@ -86,14 +86,23 @@ func (service *DicomJsonService) DispatchSuccess(completedJob CompletedJob) erro
 	log.Println("info: DispatchSuccess")
 	switch result := completedJob.ResultData.(type) {
 	case DicomCEchoResult:
-		return service.OnCFindDone(result)
+		return service.OnCEchoDone(result)
+
+	case []DicomCFindResult:
+		log.Println(result)
+		return nil
 	default:
 		log.Printf("unexpected job type %v", result)
 	}
 	return nil
 }
 
-func (service *DicomJsonService) OnCFindDone(dicomCFindResult DicomCEchoResult) error {
+func (service *DicomJsonService) OnCEchoDone(dicomCFindResult DicomCEchoResult) error {
 	service.remoteSCPState = dicomCFindResult
+	return nil
+}
+
+func (service *DicomJsonService) OnCFindDone(dicomCFindResult []DicomCFindResult) error {
+	//service.remoteSCPState = dicomCFindResult
 	return nil
 }

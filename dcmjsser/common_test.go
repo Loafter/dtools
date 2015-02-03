@@ -5,6 +5,7 @@ import "log"
 import "time"
 import "errors"
 import "math"
+
 import "strconv"
 
 //import "fmt"
@@ -55,8 +56,24 @@ func TestJobBallancer(t *testing.T) {
 
 }
 
-func TestDicomClient(t *testing.T) {
-	dicomCEchoRequest := DicomCEchoRequest{Address: "pacs.chaika.com", Port: 104, ServerAE_Title: "GEPACS"}
-	dcomClient := DCOMClient{CallerAE_Title: "AE_DTOOLS"}
-	dcomClient.CEcho(dicomCEchoRequest)
+func TestDicomCEchoClient(t *testing.T) {
+	dicomCEchoRequest := DicomCEchoRequest{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
+	dcomClient := DicomClient{CallerAE_Title: "AE_DTOOLS"}
+	if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
+		t.Errorf("error: Test stop failed %v", err)
+	} else {
+		log.Printf("info: ping result %v", pingRes)
+	}
+}
+
+func TestDicomCFindClient(t *testing.T) {
+	dcomClient := DicomClient{CallerAE_Title: "AE_DTOOLS"}
+	dicomCFindRequest := DicomCFindRequest{DicomCEchoRequest: DicomCEchoRequest{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
+	if result, err := dcomClient.CFind(dicomCFindRequest); err != nil {
+		t.Errorf("error: Test stop failed %v", err)
+	} else {
+		log.Println(result)
+	}
+	//time.Sleep(5000 * time.Millisecond)
+
 }

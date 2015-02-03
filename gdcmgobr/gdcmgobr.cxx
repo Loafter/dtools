@@ -14,10 +14,35 @@ std::vector<bool> TestVec()
 bool CEcho (const char *remote, int portno, const char *aetitle, const char *call){
 	return gdcm::CompositeNetworkFunctions::CEcho(remote,portno,aetitle,call);
 }
+ std::string GetStringValueFromTag(const gdcm::Tag t, const gdcm::DataSet ds)
+{
+  std::string buffer;
+ // buffer = "";  // cleanup previous call
 
-bool CFind(const char* callingaetitle,const char* callaetitle,const char* hostname,int port,DicomCFindRequest dicomCFindRequest,std::string* result)
+  if( ds.FindDataElement( t ) )
+    {
+    const gdcm::DataElement& de = ds.GetDataElement(t );
+    const gdcm::ByteValue *bv = de.GetByteValue();
+    if( bv ) // Can be Type 2
+      {
+      buffer = std::string( bv->GetPointer(), bv->GetLength() );
+      }
+    }
+
+  // Since return is a const char* the very first \0 will be considered
+  return buffer;
+}
+
+std::string CFind(const char* callingaetitle,const char* callaetitle,const char* hostname,int port ,
+			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
+			std::string StudyDate)
 {	
-	std::vector< std::pair<gdcm::Tag, std::string> > keys;
+    std::vector< std::pair<gdcm::Tag, std::string> > keys;
+    		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0010),PatientName));
+		keys.push_back(std::make_pair(gdcm::Tag(0x0008,0x0050),AccessionNumber)); 
+		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0030),PatienDateOfBirth));
+		keys.push_back(std::make_pair(gdcm::Tag(0x0008,0x0020),StudyDate));
+
     gdcm::ERootType theRoot = gdcm::eStudyRootType;
     gdcm::EQueryLevel theLevel = gdcm::eStudy;
  
@@ -26,7 +51,7 @@ bool CFind(const char* callingaetitle,const char* callaetitle,const char* hostna
     if (!theQuery)
       {
       std::cerr << "Query construction failed." <<std::endl;
-      return false;
+      return "";
       }
 
 
@@ -36,25 +61,29 @@ bool CFind(const char* callingaetitle,const char* callaetitle,const char* hostna
       {
       std::cerr << "You have not constructed a valid find query."
         " Please try again." << std::endl;
-      return false;
+      return "";
       } 
 	 std::vector<gdcm::DataSet> theDataSet;
-    if( !gdcm::CompositeNetworkFunctions::CFind(hostname, (uint16_t)port, theQuery, theDataSet, callingaetitle, callaetitle) )
+    if( !gdcm::CompositeNetworkFunctions::CFind(hostname, (uint16_t)port, theQuery, theDataSet,  callingaetitle,callaetitle) )
       {
       gdcmDebugMacro( "Problem in CFind." );
-      return false;
+      return "";
       }
-	gdcm::Printer p;
-	std::stringstream ss;
-    std::ostream &os = ss;
-    for( std::vector<gdcm::DataSet>::iterator itor
-      = theDataSet.begin(); itor != theDataSet.end(); itor++)
+	
+	std::string reqRes="[";
+    for(int i=0;i<theDataSet.size();i++)
       {
-      os << "Find Response: " << (itor - theDataSet.begin() + 1) << std::endl;
-      p.PrintDataSet( *itor, os );
-      os << std::endl;
+		gdcm::DataSet dat=theDataSet[i];
+		reqRes=reqRes+"{\"PatientName\":\""+GetStringValueFromTag(gdcm::Tag(0x0010,0x0010),dat)+"\",";
+		reqRes=reqRes+"\"AccessionNumber\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0050),dat)+"\",";
+		reqRes=reqRes+"\"PatienDateOfBirth\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0020),dat)+"\",";
+		reqRes=reqRes+"\"StudyDate\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0020),dat);
+		if(i==theDataSet.size()-1)
+			reqRes=reqRes+"\"}";
+		else
+			reqRes=reqRes+"\"}, \n";
       }
-	std::string retStr(ss.str());
-	return true;
+	reqRes=reqRes+"] \n";
+	return reqRes;
 }
 

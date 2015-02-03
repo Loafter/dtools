@@ -5,4 +5,5 @@
  #include "gdcmgobr.h"
  %}
  /* Parse the header file to generate wrappers */
+%include <std_string.i>
 %include "gdcmgobr.h"

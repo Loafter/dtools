@@ -6,7 +6,7 @@ import "errors"
 
 //main dicom message dispatcher
 type DicomDispatcher struct {
-	dcomClient DCOMClient
+	dcomClient DicomClient
 }
 
 func (dispatcher *DicomDispatcher) Dispatch(dicomRequest interface{}) (interface{}, error) {
