@@ -29,7 +29,7 @@ func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
 type TestErrorDispatcher struct {
 }
 
-func (*TestErrorDispatcher) DispatchError(failedJob FailedJob) error {
+func (*TestErrorDispatcher) DispatchError(failedJob FaJob) error {
 	//log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
 	return nil
 }
@@ -37,7 +37,7 @@ func (*TestErrorDispatcher) DispatchError(failedJob FailedJob) error {
 type TestCompletedDispatcher struct {
 }
 
-func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompletedJob) error {
+func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompJob) error {
 	//log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
 	return nil
 }
@@ -57,8 +57,8 @@ func TestJobBallancer(t *testing.T) {
 }
 
 func TestDicomCEchoClient(t *testing.T) {
-	dicomCEchoRequest := DicomCEchoRequest{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
-	dcomClient := DicomClient{CallerAE_Title: "AE_DTOOLS"}
+	dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
+	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
 	if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
 		t.Errorf("error: Test stop failed %v", err)
 	} else {
@@ -67,10 +67,10 @@ func TestDicomCEchoClient(t *testing.T) {
 }
 
 func TestDicomCFindClient(t *testing.T) {
-	dcomClient := DicomClient{CallerAE_Title: "AE_DTOOLS"}
-	dicomCFindRequest := DicomCFindRequest{DicomCEchoRequest: DicomCEchoRequest{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
+	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
+	dicomCFindRequest := FindReq{EchoReq: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
 	if result, err := dcomClient.CFind(dicomCFindRequest); err != nil {
-		t.Errorf("error: Test stop failed %v", err)
+		t.Errorf("error: Test stop fail %v", err)
 	} else {
 		log.Println(result)
 	}

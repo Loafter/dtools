@@ -4,14 +4,14 @@ import "encoding/json"
 import "errors"
 
 // common dicom requests
-type DicomCEchoRequest struct {
+type EchoReq struct {
 	Address        string `json:"Address"`
 	Port           int    `json:"Port,string"`
 	ServerAE_Title string `json:"ServerAE_Title"`
 }
 
-func (dicomCEchoRequest *DicomCEchoRequest) InitFromJsonData(data []byte) error {
-	err := json.Unmarshal(data, &dicomCEchoRequest)
+func (ereq *EchoReq) InitFromJsonData(data []byte) error {
+	err := json.Unmarshal(data, &ereq)
 	if err != nil {
 		return errors.New("error: Can't parse dicom cEcho request data")
 	}
@@ -19,20 +19,20 @@ func (dicomCEchoRequest *DicomCEchoRequest) InitFromJsonData(data []byte) error 
 
 }
 
-type DicomCFindRequest struct {
-	DicomCEchoRequest
+type FindReq struct {
+	EchoReq
 	PatientName       string `json:"PatientName"`
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
 	StudyDate         string `json:"StudyDate"`
 }
 
-type DicomCEchoResult struct {
+type EchoRes struct {
 	IsAlive bool `json:"IsAlive"`
 }
 
-func (dicomCFindRequest *DicomCFindRequest) InitFromJsonData(data []byte) error {
-	err := json.Unmarshal(data, &dicomCFindRequest)
+func (freq *FindReq) InitFromJsonData(data []byte) error {
+	err := json.Unmarshal(data, &freq)
 	if err != nil {
 		return errors.New("error: Can't parse dicom cFind request data")
 	}
@@ -40,7 +40,7 @@ func (dicomCFindRequest *DicomCFindRequest) InitFromJsonData(data []byte) error 
 
 }
 
-type DicomCFindResult struct {
+type FindRes struct {
 	PatientName       string `json:"PatientName"`
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`

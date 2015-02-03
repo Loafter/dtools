@@ -5,16 +5,16 @@ import "errors"
 //import "log"
 
 //main dicom message dispatcher
-type DicomDispatcher struct {
-	dcomClient DicomClient
+type DDisp struct {
+	dCln DClient
 }
 
-func (dispatcher *DicomDispatcher) Dispatch(dicomRequest interface{}) (interface{}, error) {
-	switch typedRequest := dicomRequest.(type) {
-	case DicomCEchoRequest:
-		return dispatcher.dcomClient.CEcho(typedRequest)
-	case DicomCFindRequest:
-		return dispatcher.dcomClient.CFind(typedRequest)
+func (dsp *DDisp) Dispatch(dreq interface{}) (interface{}, error) {
+	switch tr := dreq.(type) {
+	case EchoReq:
+		return dsp.dCln.CEcho(tr)
+	case FindReq:
+		return dsp.dCln.CFind(tr)
 
 	}
 	return nil, errors.New("error: can't dispatch non dicom request type")

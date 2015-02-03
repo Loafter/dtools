@@ -14,15 +14,15 @@ type Job struct {
 	Data  interface{}
 }
 
-type FailedJob struct {
+type FaJob struct {
 	Job       Job
 	ErrorData interface{}
 }
 
-type CompletedJob struct {
+type CompJob struct {
 	Job        Job
 	ResultData interface{}
 }
 
-type TerminateDispatchJob struct {
+type TermJob struct {
 }
