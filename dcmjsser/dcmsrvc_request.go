@@ -20,7 +20,7 @@ func (ereq *EchoReq) InitFromJsonData(data []byte) error {
 }
 
 type FindReq struct {
-	EchoReq
+	ServerSet         EchoReq
 	PatientName       string `json:"PatientName"`
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`

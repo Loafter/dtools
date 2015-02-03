@@ -7,8 +7,8 @@ import "runtime"
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	dicomJsonService := DJsServ{}
-	if err := dicomJsonService.Start(9978); err != nil {
+	djs := DJsServ{}
+	if err := djs.Start(9978); err != nil {
 		log.Println(err)
 	}
 }

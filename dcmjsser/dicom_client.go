@@ -28,8 +28,8 @@ func (dc *DClient) CMove() error {
 }
 
 func (dc *DClient) CFind(freq FindReq) (interface{}, error) {
-	cfindResult := gdcmgobr.CFind(dc.CallerAE_Title, freq.ServerAE_Title, freq.Address,
-		freq.Port, freq.PatientName, freq.AccessionNumber,
+	cfindResult := gdcmgobr.CFind(dc.CallerAE_Title, freq.ServerSet.ServerAE_Title, freq.ServerSet.Address,
+		freq.ServerSet.Port, freq.PatientName, freq.AccessionNumber,
 		freq.PatienDateOfBirth, freq.StudyDate)
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)

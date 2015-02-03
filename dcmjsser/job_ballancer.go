@@ -34,7 +34,7 @@ func (jbal *JobBallancer) startJob(jdat interface{}) {
 		log.Println("info: failed job detected")
 		jbal.jChan <- FaJob{Job: job, ErrorData: err}
 	} else {
-		log.Printf("info: compleated job detected %v", dispResult)
+		log.Printf("info: completed job detected %v", dispResult)
 		jbal.jChan <- CompJob{Job: job, ResultData: dispResult}
 	}
 
@@ -100,7 +100,7 @@ func (jbal *JobBallancer) getJobByID(jid string) (*Job, error) {
 //add job
 func (jbal *JobBallancer) addJob(job Job) error {
 	if jbal.acJob == nil {
-		return errors.New("error: job list is null")
+		return errors.New("error: job list not inited")
 	}
 	jbal.acJob[job.JobId] = job
 	return nil

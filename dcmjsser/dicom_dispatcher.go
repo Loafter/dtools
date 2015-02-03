@@ -2,8 +2,6 @@ package main
 
 import "errors"
 
-//import "log"
-
 //main dicom message dispatcher
 type DDisp struct {
 	dCln DClient

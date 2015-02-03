@@ -18,7 +18,7 @@
 			padding-bottom: 40px;
 		}
 		/* Main marketing message and sign up button */
-
+		
 		.jumbotron {
 			text-align: center;
 			background-color: transparent;
@@ -28,7 +28,7 @@
 			padding: 14px 24px;
 		}
 		/* Customize the nav-justified links to be fill the entire space of the .navbar */
-
+		
 		.nav-justified {
 			background-color: #eee;
 			border-radius: 5px;
@@ -43,28 +43,28 @@
 			border-bottom: 1px solid #d5d5d5;
 			background-color: #e5e5e5;
 			/* Old browsers */
-
+			
 			background-repeat: repeat-x;
 			/* Repeat the gradient */
-
+			
 			background-image: -moz-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
 			/* FF3.6+ */
-
+			
 			background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #e5e5e5));
 			/* Chrome,Safari4+ */
-
+			
 			background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
 			/* Chrome 10+,Safari 5.1+ */
-
+			
 			background-image: -ms-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
 			/* IE10+ */
-
+			
 			background-image: -o-linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
 			/* Opera 11.10+ */
-
+			
 			filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#e5e5e5', GradientType=0);
 			/* IE6-9 */
-
+			
 			background-image: linear-gradient(top, #f5f5f5 0%, #e5e5e5 100%);
 			/* W3C */
 		}
@@ -100,10 +100,10 @@
 			}
 		}
 		/* Responsive: Portrait tablets and up */
-
+		
 		@media screen and(min-width: 768px) {
 			/* Remove the padding we set earlier */
-
+			
 			.masthead,
 			.marketing,
 			.footer {
@@ -130,20 +130,38 @@
 					$("#pacs-status-id").text("ok")
 					$("#search-panel").fadeIn("slow");
 					$("#search-footer").fadeIn("slow");
-					
 				} else {
 					$("#pacs-status-id").text("no connection")
 					$("#search-panel").fadeOut("slow");
 					$("#search-footer").fadeOut("slow");
 				}
+			})
+		}
 
+		function sendCFind() {
+			var cfdat = {
+				ServerSet: {
+					Address: $("#address-id").val(),
+					Port: $("#port-id").val(),
+					ServerAE_Title: $("#aetitle-id").val()
+				},
+				PatientName: $("#patient-name-id").val(),
+				AccessionNumber: $("#accession-number-id").val(),
+				PatienDateOfBirth: $("#date-birth-id").val(),
+				StudyDate: $("#study-date-id").val()
+			};
+			$.ajax({
+				url: "/c-find",
+				type: "POST",
+				data: JSON.stringify(cfdat),
+				dataType: "json"
 			})
 		}
 
 		function OnLoad() {
-			$("#search-panel").fadeOut("slow");
-			$("#search-footer").fadeOut("slow");
-			setInterval(updateCEchoSt, 700)
+			//$("#search-panel").fadeOut("slow");
+			//$("#search-footer").fadeOut("slow");
+			//setInterval(updateCEchoSt, 700)
 		}
 	</script>
 </head>
@@ -193,42 +211,35 @@
 					<tr>
 						<td>
 							<div class="form-group">
-								<label class="control-label">Patient name</label>
+								<label class="control-label" >Patient name</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm"> </div>
+									<input type="text" class="form-control input-sm" id="patient-name-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label">Patient MRN</label>
+								<label class="control-label" >Accession number</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm"> </div>
+									<input type="text" class="form-control input-sm" id="accession-number-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label">Study ID</label>
+								<label class="control-label" >Date of birth</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm"> </div>
-							</div>
-						</td>
-						<td>
-							<div class="form-group">
-								<label class="control-label">Date of birth</label>
-								<div class="controls">
-									<input type="text" class="form-control input-sm"> </div>
+									<input type="text" class="form-control input-sm" id="date-birth-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
 								<label class="control-label">Study date</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm"> </div>
+									<input type="text" class="form-control input-sm" id="study-date-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<p></p> <a onclick="updateCEchoSt()" class="btn btn-success">F I N D</a> </div>
+								<p></p> <a onclick="sendCFind()" class="btn btn-success">F I N D</a> </div>
 						</td>
 					</tr>
 				</tbody>

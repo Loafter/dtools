@@ -68,7 +68,7 @@ func TestDicomCEchoClient(t *testing.T) {
 
 func TestDicomCFindClient(t *testing.T) {
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
-	dicomCFindRequest := FindReq{EchoReq: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
+	dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
 	if result, err := dcomClient.CFind(dicomCFindRequest); err != nil {
 		t.Errorf("error: Test stop fail %v", err)
 	} else {
