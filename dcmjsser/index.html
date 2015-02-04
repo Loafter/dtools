@@ -113,6 +113,8 @@
 		}
 	</style>
 	<script type="text/javascript">
+		var cfTime = new Date();
+
 		function updateCEchoSt() {
 			var cEChoReq = {
 				Address: $("#address-id").val(),
@@ -158,7 +160,19 @@
 			})
 		}
 
+		function updateCFindSt() {
+			$.ajax({
+				url: "/c-finddat",
+				type: "POST",
+				data: JSON.stringify(cfTime.toJSON()),
+				dataType: "json"
+			}).done(function(jsonData) {
+				console.log(jsonData)
+			})
+		}
+
 		function OnLoad() {
+			cfTime = new Date();
 			//$("#search-panel").fadeOut("slow");
 			//$("#search-footer").fadeOut("slow");
 			//setInterval(updateCEchoSt, 700)
@@ -211,21 +225,21 @@
 					<tr>
 						<td>
 							<div class="form-group">
-								<label class="control-label" >Patient name</label>
+								<label class="control-label">Patient name</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="patient-name-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label" >Accession number</label>
+								<label class="control-label">Accession number</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="accession-number-id"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label" >Date of birth</label>
+								<label class="control-label">Date of birth</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="date-birth-id"> </div>
 							</div>
@@ -239,10 +253,23 @@
 						</td>
 						<td>
 							<div class="form-group">
-								<p></p> <a onclick="sendCFind()" class="btn btn-success">F I N D</a> </div>
+								<p></p> <a onclick="sendCFind()" class="btn btn-success">F I N D</a>
+								<p></p> <a onclick="updateCFindSt()" class="btn btn-success">T E S T</a> </div>
 						</td>
 					</tr>
 				</tbody>
+			</table>
+			<div class="panel-footer">C-Find result</div>
+			<table class="table table-bordered table-condensed table-hover table-striped">
+				<thead>
+					<tr>
+						<th>Patient name</th>
+						<th>Accession number</th>
+						<th>Patient date if birth</th>
+						<th>Study date</th>
+					</tr>
+				</thead>
+				<tbody id="process-list-table"> </tbody>
 			</table>
 		</div>
 	</div>
