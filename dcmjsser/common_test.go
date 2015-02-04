@@ -74,6 +74,4 @@ func TestDicomCFindClient(t *testing.T) {
 	} else {
 		log.Println(result)
 	}
-	//time.Sleep(5000 * time.Millisecond)
-
 }

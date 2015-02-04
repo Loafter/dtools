@@ -130,12 +130,16 @@
 				console.log(jsonData)
 				if (jsonData.IsAlive) {
 					$("#pacs-status-id").text("ok")
-					$("#search-panel").fadeIn("slow");
-					$("#search-footer").fadeIn("slow");
+					$("#search-panel").fadeIn("slow")
+					$("#search-footer").fadeIn("slow")
+					$("#serfooter-id").fadeIn("slow")
+					$("#sertable-id").fadeIn("slow")
 				} else {
 					$("#pacs-status-id").text("no connection")
 					$("#search-panel").fadeOut("slow");
 					$("#search-footer").fadeOut("slow");
+					$("#serfooter-id").fadeOut("slow")
+					$("#sertable-id").fadeOut("slow")
 				}
 			})
 		}
@@ -167,14 +171,21 @@
 				data: JSON.stringify(cfTime.toJSON()),
 				dataType: "json"
 			}).done(function(jsonData) {
-				console.log(jsonData)
+				if (jsonData.Refresh) {
+					cfTime = new Date(jsonData.FTime)
+					console.log(jsonData.CfindRes)
+				} else {
+					console.log("no need to update")
+				}
 			})
 		}
 
 		function OnLoad() {
 			cfTime = new Date();
-			//$("#search-panel").fadeOut("slow");
-			//$("#search-footer").fadeOut("slow");
+			//$("#serfooter-id").fadeOut("slow")
+			//$("#sertable-id").fadeOut("slow")
+			//$("#search-panel").fadeOut("slow")
+			//$("#search-footer").fadeOut("slow")
 			//setInterval(updateCEchoSt, 700)
 		}
 	</script>
@@ -259,8 +270,8 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="panel-footer">C-Find result</div>
-			<table class="table table-bordered table-condensed table-hover table-striped">
+			<div class="panel-footer" id="serfooter-id">C-Find result</div>
+			<table class="table table-bordered table-condensed table-hover table-striped" id="sertable-id">
 				<thead>
 					<tr>
 						<th>Patient name</th>

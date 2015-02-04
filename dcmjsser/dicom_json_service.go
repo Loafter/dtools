@@ -120,7 +120,7 @@ func (srv *DJsServ) cFindData(rwr http.ResponseWriter, req *http.Request) {
 		log.Println(strErr)
 		return
 	}
-	if lctim.After(srv.fndTm) {
+	if lctim.Before(srv.fndTm) {
 		fdat := FindData{Refresh: false}
 		js, err := json.Marshal(fdat)
 		if err != nil {
