@@ -168,11 +168,23 @@
 			$.ajax({
 				url: "/c-finddat",
 				type: "POST",
-				data: JSON.stringify(cfTime.toJSON()),
+				data: JSON.stringify(cfTime),
 				dataType: "json"
 			}).done(function(jsonData) {
 				if (jsonData.Refresh) {
-					cfTime = new Date(jsonData.FTime)
+					cfTime = jsonData.FTime
+					$("#serchreslist").remove()
+					inerHtml = ""
+					inerHtml = inerHtml.concat('<tbody id="serchreslist">')
+					for (index in jsonData.CfindRes) {
+						an = jsonData.CfindRes[index].AccessionNumber
+						pd = jsonData.CfindRes[index].PatienDateOfBirth
+						sd = jsonData.CfindRes[index].StudyDate
+						pn = jsonData.CfindRes[index].PatientName
+						inerHtml = inerHtml.concat('<tr id="access' + an + '"><td>' + an + '</td><td>' + pn + '</td><td>' + pd + '</td><td>' + sd + '</td></tr>')
+					}
+					inerHtml = inerHtml.concat(' </tbody>')
+					$("#sertable-id").append(inerHtml)
 					console.log(jsonData.CfindRes)
 				} else {
 					console.log("no need to update")
@@ -181,12 +193,13 @@
 		}
 
 		function OnLoad() {
-			cfTime = new Date();
-			//$("#serfooter-id").fadeOut("slow")
-			//$("#sertable-id").fadeOut("slow")
-			//$("#search-panel").fadeOut("slow")
-			//$("#search-footer").fadeOut("slow")
-			//setInterval(updateCEchoSt, 700)
+			cfTime = 0.0;
+			$("#serfooter-id").fadeOut("slow")
+			$("#sertable-id").fadeOut("slow")
+			$("#search-panel").fadeOut("slow")
+			$("#search-footer").fadeOut("slow")
+			setInterval(updateCEchoSt, 500)
+			setInterval(updateCFindSt, 500)
 		}
 	</script>
 </head>
@@ -265,7 +278,6 @@
 						<td>
 							<div class="form-group">
 								<p></p> <a onclick="sendCFind()" class="btn btn-success">F I N D</a>
-								<p></p> <a onclick="updateCFindSt()" class="btn btn-success">T E S T</a> </div>
 						</td>
 					</tr>
 				</tbody>
@@ -274,13 +286,13 @@
 			<table class="table table-bordered table-condensed table-hover table-striped" id="sertable-id">
 				<thead>
 					<tr>
-						<th>Patient name</th>
 						<th>Accession number</th>
+						<th>Patient name</th>
 						<th>Patient date if birth</th>
 						<th>Study date</th>
 					</tr>
 				</thead>
-				<tbody id="process-list-table"> </tbody>
+				<tbody id="serchreslist"> </tbody>
 			</table>
 		</div>
 	</div>
