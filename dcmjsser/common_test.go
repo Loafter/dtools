@@ -75,3 +75,12 @@ func TestDicomCFindClient(t *testing.T) {
 		log.Println(result)
 	}
 }
+func TestDbrsvr(t *testing.T) {
+	/*	db := new(Dbrwsr)
+		db.ChDir(".")
+		log.Println(db.Lsd())
+		log.Println(db.Dir())
+		db.GoUp()
+		log.Println(db.Lsd())
+		log.Println(db.Dir())*/
+}

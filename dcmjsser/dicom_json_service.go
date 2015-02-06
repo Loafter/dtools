@@ -7,6 +7,7 @@ import "log"
 import "encoding/json"
 import "errors"
 import "time"
+import "os"
 
 import "encoding/base64"
 
@@ -34,7 +35,9 @@ func (srv *DJsServ) Start(listenPort int) error {
 	http.HandleFunc("/c-echo", srv.cEcho)
 	http.HandleFunc("/c-find", srv.cFind)
 	http.HandleFunc("/c-finddat", srv.cFindData)
-	http.HandleFunc("/index.html", srv.ServePage)
+	http.HandleFunc("/index.html", srv.index)
+	http.HandleFunc("/upload.html", srv.upload)
+	http.HandleFunc("/chd", srv.chd)
 	if err := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil); err != nil {
 		return errors.New("error: can't start listen http server")
 	}
@@ -143,12 +146,26 @@ func (srv *DJsServ) cFindData(rwr http.ResponseWriter, req *http.Request) {
 }
 
 //serve main page request
-func (srv *DJsServ) ServePage(rwr http.ResponseWriter, req *http.Request) {
+func (srv *DJsServ) index(rwr http.ResponseWriter, req *http.Request) {
 	rwr.Header().Set("Content-Type: text/html", "*")
 
 	content, err := ioutil.ReadFile("index.html")
 	if err != nil {
 		log.Println("warning: start page not found, return included page")
+		val, _ := base64.StdEncoding.DecodeString(htmlData)
+		rwr.Write(val)
+		return
+	}
+	rwr.Write(content)
+}
+
+//serve main page request
+func (srv *DJsServ) upload(rwr http.ResponseWriter, req *http.Request) {
+	rwr.Header().Set("Content-Type: text/html", "*")
+
+	content, err := ioutil.ReadFile("upload.html")
+	if err != nil {
+		log.Println("warning: upload page not found, return included page")
 		val, _ := base64.StdEncoding.DecodeString(htmlData)
 		rwr.Write(val)
 		return
@@ -166,22 +183,61 @@ func (srv *DJsServ) DispatchSuccess(cjb CompJob) error {
 	log.Println("info: DispatchSuccess")
 	switch result := cjb.ResultData.(type) {
 	case EchoRes:
-		return srv.OnCEchoDone(result)
+		return srv.onCEchoDone(result)
 	case []FindRes:
-		return srv.OnCFindDone(result)
+		return srv.onCFindDone(result)
 	default:
 		log.Printf("unexpected job type %v", result)
 	}
 	return nil
 }
 
-func (srv *DJsServ) OnCEchoDone(eres EchoRes) error {
+func (srv *DJsServ) onCEchoDone(eres EchoRes) error {
 	srv.echSta = eres
 	return nil
 }
 
-func (srv *DJsServ) OnCFindDone(fres []FindRes) error {
+func (srv *DJsServ) onCFindDone(fres []FindRes) error {
 	srv.fRes = fres
 	srv.fndTm = time.Now().Nanosecond()
 	return nil
+}
+
+func (srv *DJsServ) chd(rwr http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+
+	bodyData, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		strErr := "error: Can't read http body data"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+	var chd struct {
+		New    string
+		CurDir string
+	}
+	if err := json.Unmarshal(bodyData, &chd); err != nil {
+		strErr := "error: can't parse new dir data"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+
+	dir, ls, err := Lsd(chd.CurDir + string(os.PathSeparator) + chd.New)
+	if err != nil {
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+	}
+	var rd struct {
+		Files  []Finfo
+		CurDir string
+	}
+	rd.CurDir = dir
+	rd.Files = ls
+	js, err := json.Marshal(rd)
+	if err != nil {
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rwr.Write(js)
 }

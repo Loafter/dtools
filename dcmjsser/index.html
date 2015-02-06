@@ -199,7 +199,7 @@
 			$("#search-panel").fadeOut("slow")
 			$("#search-footer").fadeOut("slow")
 			setInterval(updateCEchoSt, 500)
-			setInterval(updateCFindSt, 500)
+			setInterval(updateCFindSt, 200)
 		}
 	</script>
 </head>
@@ -286,10 +286,10 @@
 			<table class="table table-bordered table-condensed table-hover table-striped" id="sertable-id">
 				<thead>
 					<tr>
-						<th>Accession number</th>
+						<th  style="width: 20%;">Accession number</th>
 						<th>Patient name</th>
-						<th>Patient date if birth</th>
-						<th>Study date</th>
+						<th style="width: 25%;">Patient date of birth</th>
+						<th style="width: 15%;">Study date</th>
 					</tr>
 				</thead>
 				<tbody id="serchreslist"> </tbody>
