@@ -6,7 +6,7 @@ import "time"
 import "errors"
 import "math"
 
-import "strconv"
+//import "strconv"
 
 //import "fmt"
 
@@ -42,45 +42,43 @@ func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompJob) error {
 	return nil
 }
 
+/*
 func TestJobBallancer(t *testing.T) {
-	testJobDispatcher := TestJobDispatcher{}
-	testErrorDispatcher := TestErrorDispatcher{}
-	testSuccessDispatcher := TestCompletedDispatcher{}
-	jobBallancer := JobBallancer{}
-	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
-	for i := 0; i < 5; i++ {
-		jobBallancer.PushJob("is error" + strconv.Itoa(i))
-	}
+		testJobDispatcher := TestJobDispatcher{}
+		testErrorDispatcher := TestErrorDispatcher{}
+		testSuccessDispatcher := TestCompletedDispatcher{}
+		jobBallancer := JobBallancer{}
+		jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
+		for i := 0; i < 5; i++ {
+			jobBallancer.PushJob("is error" + strconv.Itoa(i))
+		}
 
-	jobBallancer.TerminateTakeJob()
+		jobBallancer.TerminateTakeJob()
 
 }
 
 func TestDicomCEchoClient(t *testing.T) {
-	dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
-	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
-	if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
-		t.Errorf("error: Test stop failed %v", err)
-	} else {
-		log.Printf("info: ping result %v", pingRes)
-	}
+		dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
+		dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
+		if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
+			t.Errorf("error: Test stop failed %v", err)
+		} else {
+			log.Printf("info: ping result %v", pingRes)
+		}
 }
-
+*/
 func TestDicomCFindClient(t *testing.T) {
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
-	dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "Ab*"}
-	if result, err := dcomClient.CFind(dicomCFindRequest); err != nil {
-		t.Errorf("error: Test stop fail %v", err)
-	} else {
-		log.Println(result)
+	disp := DDisp{dCln: dcomClient}
+	for i := 0; i < 200; i++ {
+		dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "A*"}
+		go func() {
+			if result, err := disp.Dispatch(dicomCFindRequest); err != nil {
+				t.Errorf("error: Test stop fail %v", err)
+			} else {
+				log.Println(result)
+			}
+		}()
 	}
-}
-func TestDbrsvr(t *testing.T) {
-	/*	db := new(Dbrwsr)
-		db.ChDir(".")
-		log.Println(db.Lsd())
-		log.Println(db.Dir())
-		db.GoUp()
-		log.Println(db.Lsd())
-		log.Println(db.Dir())*/
+	time.Sleep(time.Second * 100)
 }

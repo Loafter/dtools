@@ -5,8 +5,8 @@
 #include <gdcmCompositeNetworkFunctions.h>
 #include <vector>
 
-bool CEcho (const char *remote, int portno, const char *aetitle, const char *call);
-std::string CFind(const char* callingaetitle,const char* callaetitle,const char* hostname,int port ,
+bool CEcho (std::string, int portno, std::string aetitle, std::string call);
+std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
 			std::string StudyDate);
 #endif

@@ -8,6 +8,7 @@ type DDisp struct {
 }
 
 func (dsp *DDisp) Dispatch(dreq interface{}) (interface{}, error) {
+
 	switch tr := dreq.(type) {
 	case EchoReq:
 		return dsp.dCln.CEcho(tr)

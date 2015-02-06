@@ -11,14 +11,12 @@ std::vector<bool> TestVec()
 	return cfindResult;
 }
 
-bool CEcho (const char *remote, int portno, const char *aetitle, const char *call){
-	return gdcm::CompositeNetworkFunctions::CEcho(remote,portno,aetitle,call);
+bool CEcho (std::string remote, int portno, std::string aetitle,std::string call){
+	return gdcm::CompositeNetworkFunctions::CEcho(remote.c_str(),portno,aetitle.c_str(),call.c_str());
 }
  std::string GetStringValueFromTag(const gdcm::Tag t, const gdcm::DataSet ds)
 {
   std::string buffer;
- // buffer = "";  // cleanup previous call
-
   if( ds.FindDataElement( t ) )
     {
     const gdcm::DataElement& de = ds.GetDataElement(t );
@@ -33,7 +31,7 @@ bool CEcho (const char *remote, int portno, const char *aetitle, const char *cal
   return buffer;
 }
 
-std::string CFind(const char* callingaetitle,const char* callaetitle,const char* hostname,int port ,
+std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
 			std::string StudyDate)
 {	
@@ -54,7 +52,7 @@ std::string CFind(const char* callingaetitle,const char* callaetitle,const char*
       return "";
       }
 
-
+	;
     //doing a non-strict query, the second parameter there.
     //look at the base query comments
     if (!theQuery->ValidateQuery(false))
@@ -64,12 +62,12 @@ std::string CFind(const char* callingaetitle,const char* callaetitle,const char*
       return "";
       } 
 	 std::vector<gdcm::DataSet> theDataSet;
-    if( !gdcm::CompositeNetworkFunctions::CFind(hostname, (uint16_t)port, theQuery, theDataSet,  callingaetitle,callaetitle) )
+    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet,  callingaetitle.c_str(),callaetitle.c_str()) )
       {
-      gdcmDebugMacro( "Problem in CFind." );
-      return "";
+		std::cout<<"cfind err";
+        return "[]";
       }
-	
+
 	std::string reqRes="[";
     for(int i=0;i<theDataSet.size();i++)
       {

@@ -4,6 +4,8 @@ import "errors"
 import "dtools/gdcmgobr"
 import "encoding/json"
 
+//import "log"
+
 type DClient struct {
 	CallerAE_Title string
 }
@@ -28,13 +30,19 @@ func (dc *DClient) CMove() error {
 }
 
 func (dc *DClient) CFind(freq FindReq) (interface{}, error) {
-	cfindResult := gdcmgobr.CFind(dc.CallerAE_Title, freq.ServerSet.ServerAE_Title, freq.ServerSet.Address,
-		freq.ServerSet.Port, freq.PatientName, freq.AccessionNumber,
-		freq.PatienDateOfBirth, freq.StudyDate)
+	cae := dc.CallerAE_Title
+	sae := freq.ServerSet.ServerAE_Title
+	ip := freq.ServerSet.Address
+	port := freq.ServerSet.Port
+	pn := freq.PatientName
+	an := freq.AccessionNumber
+	bd := freq.PatienDateOfBirth
+	sd := freq.StudyDate
+	cfindResult := gdcmgobr.CFind(cae, sae, ip, port, pn, an, bd, sd)
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)
 	if err != nil {
-		return nil, errors.New("error: Can't parse dicom cFind result data")
+		return nil, errors.New("error: Can't parse dicom cFind result data " + err.Error() + cfindResult)
 	}
 	return fdat, nil
 }
