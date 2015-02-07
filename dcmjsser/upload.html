@@ -152,7 +152,7 @@
 			for (index in jsonData.Files) {
 				nm = jsonData.Files[index].Name
 				di = jsonData.Files[index].IsDir
-				inerHtml = inerHtml.concat('<tr width="5"><td><div class="checkbox pull-left"><label><input type="checkbox" value="true"></label></div></td>')
+				inerHtml = inerHtml.concat('<tr width="5"><td><div class="checkbox pull-left"> <label>  <a class="btn pull-right btn-success btn-sm">Upload</a></label></div></td>')
 				if (jsonData.Files[index].IsDir){
 					inerHtml = inerHtml.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				}else{
@@ -176,7 +176,7 @@
 	<table id="files-tab" class="table table-bordered table-striped table-condensed">
 		<thead>
 			<tr>
-				<th style="width: 1%;">Select</th>
+				<th style="width: 10%;">Select</th>
 				<th>File Name</th>
 			</tr>
 		</thead>
@@ -212,6 +212,7 @@
 				<td>no</td>
 			</tr>
 		</tbody>
-	</table> <a class="btn pull-right btn-success btn-sm">Upload<xt a>  </xt></a><a class="btn pull-right btn-warning btn-sm">Refresh</a> </body>
+	</table> <a class="btn pull-right btn-success btn-sm">Upload<xt a>
+	 </body>
 
 </html>
