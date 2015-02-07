@@ -204,6 +204,31 @@ func (jbal *JobBallancer) Init(jdis JobDispatcher, cmd CompDispatcher, erd ErrDi
 	log.Println("info: job ballancer inited")
 }
 
+func (jbal JobBallancer) GetJobsList() ([]string, error) {
+	if jbal.checkInit() {
+		return nil, errors.New("error: job ballancer is not inited")
+	}
+	descr := []string{}
+
+	for i := range jbal.acJob {
+		if de, ok := jbal.acJob[i].Data.(Descriptable); ok {
+			descr = append(descr, "active job: "+de.GetDescript())
+		} else {
+			descr = append(descr, "active job: this type job don't have description")
+		}
+
+	}
+	for i := range jbal.slJob {
+		if de, ok := jbal.slJob[i].Data.(Descriptable); ok {
+			descr = append(descr, "sleped job: "+de.GetDescript())
+		} else {
+			descr = append(descr, "sleped job: this type job don't have description")
+		}
+
+	}
+	return descr, nil
+}
+
 func genUid() string {
 	b := make([]byte, 16)
 	rand.Read(b)

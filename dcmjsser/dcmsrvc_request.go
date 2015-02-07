@@ -2,12 +2,17 @@ package main
 
 import "encoding/json"
 import "errors"
+import "strconv"
 
 // common dicom requests
 type EchoReq struct {
 	Address        string `json:"Address"`
 	Port           int    `json:"Port,string"`
 	ServerAE_Title string `json:"ServerAE_Title"`
+}
+
+func (ereq EchoReq) GetDescript() string {
+	return "C-Echo request  " + ereq.Address + ":" + strconv.Itoa(ereq.Port) + " AE_TITLE:" + ereq.ServerAE_Title
 }
 
 func (ereq *EchoReq) InitFromJsonData(data []byte) error {
@@ -38,6 +43,11 @@ func (freq *FindReq) InitFromJsonData(data []byte) error {
 	}
 	return nil
 
+}
+
+func (freq FindReq) GetDescript() string {
+	st := freq.PatientName + " " + freq.AccessionNumber + " " + freq.PatienDateOfBirth + " " + freq.StudyDate
+	return "C-Find request  " + freq.ServerSet.Address + ":" + strconv.Itoa(freq.ServerSet.Port) + st
 }
 
 type FindRes struct {

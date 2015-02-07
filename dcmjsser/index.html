@@ -160,9 +160,17 @@
 				$("#uploadfooter-id").hide()
 				$("#files-tab").hide()
 			}
+			if (disAlive && (ShowMenu == "jobs")) {
+				$("#jobslistfooter-id").show()
+				$("#jobslist").show()
+			} else {
+				$("#jobslistfooter-id").hide()
+				$("#jobslist").hide()
+			}
 		}
 
 		function sendCFind() {
+			updateJobs()
 			var cfdat = {
 				ServerSet: {
 					Address: $("#address-id").val(),
@@ -192,7 +200,7 @@
 				if (jsonData.Refresh) {
 					cfTime = jsonData.FTime
 					$("#serchreslist").remove()
-					inerHtml = ""
+					var inerHtml = ""
 					inerHtml = inerHtml.concat('<tbody id="serchreslist">')
 					for (index in jsonData.CfindRes) {
 						an = jsonData.CfindRes[index].AccessionNumber
@@ -207,6 +215,7 @@
 				} else {
 					console.log("no need to update")
 				}
+
 			})
 		}
 
@@ -240,22 +249,37 @@
 			$("#files-id").remove()
 			curdir = jsonData.CurDir
 			console.log(jsonData)
-			inerHtml = ""
-			inerHtml = inerHtml.concat('<tbody id="files-id">')
-			inerHtml = inerHtml.concat('<tr><td></td>')
-			inerHtml = inerHtml.concat('<td onclick="chDir(this)" id=".."><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">..</td></tr>')
+			var inerHtmlfiles = ""
+			inerHtmlfiles = inerHtmlfiles.concat('<tbody id="files-id">')
+			inerHtmlfiles = inerHtmlfiles.concat('<tr><td></td>')
+			inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" id=".."><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">..</td></tr>')
 			for (index in jsonData.Files) {
 				nm = jsonData.Files[index].Name
 				di = jsonData.Files[index].IsDir
-				inerHtml = inerHtml.concat('<tr width="5"><td><a class="btn pull-left btn-success btn-xs">Upload</a></td>')
+				inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a class="btn pull-left btn-success btn-xs">Upload</a></td>')
 				if (jsonData.Files[index].IsDir) {
-					inerHtml = inerHtml.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
+					inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				} else {
-					inerHtml = inerHtml.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://www.freecadweb.org/wiki/images/2/29/Document-new.svg" width="30" alt="lorem">' + nm + '</td></tr>')
+					inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://www.freecadweb.org/wiki/images/2/29/Document-new.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				}
 			}
-			inerHtml = inerHtml.concat('</tbody>')
-			$("#files-tab").append(inerHtml)
+			inerHtmlfiles = inerHtmlfiles.concat('</tbody>')
+			$("#files-tab").append(inerHtmlfiles)
+		}
+
+		function updateJobs() {
+			$("#jobslist").html("")
+			$.ajax({
+				url: "/jobs",
+				type: "POST",
+				dataType: "json"
+			}).done(function(jsonData) {
+				var inerHtmljobs = ""
+				for (index in jsonData) {
+					inerHtmljobs = inerHtmljobs.concat('<li class="list-group-item">' + jsonData[index] + '</li>')
+				}
+				$("#jobslist").append(inerHtmljobs)
+			})
 		}
 
 		function OnLoad() {
@@ -263,6 +287,7 @@
 			updateUi()
 			setInterval(updateCEchoSt, 500)
 			setInterval(updateCFindSt, 200)
+			setInterval(updateJobs, 2000)
 			firsUpdate()
 		}
 
@@ -274,6 +299,13 @@
 		function ShowUpload() {
 			ShowMenu = "upload"
 			updateUi()
+		}
+
+		function ShowJobs() {
+			ShowMenu = "jobs"
+			updateJobs()
+			updateUi()
+			
 		}
 	</script>
 </head>
@@ -290,7 +322,7 @@
 						<ul class="nav navbar-nav">
 							<li onclick="ShowSearch()"> <a>Search</a> </li>
 							<li onclick="ShowUpload()"> <a>Study Upload</a> </li>
-							<li> <a>Jobs</a> </li>
+							<li onclick="ShowJobs()"> <a>Jobs</a> </li>
 							<li> <a>Log</a> </li>
 						</ul>
 					</div>
@@ -426,6 +458,12 @@
 					</tr>
 				</tbody>
 			</table>
+			<div class="panel-footer" id="jobslistfooter-id">Jobs</div>
+			<ul id="jobslist" class="list-group">
+				<li class="list-group-item">First Item</li>
+				<li class="list-group-item">Second Item</li>
+				<li class="list-group-item">Third Item</li>
+			</ul>
 		</div>
 	</div>
 </body>

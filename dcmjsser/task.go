@@ -6,6 +6,10 @@ const (
 	Done
 )
 
+type Descriptable interface {
+	GetDescript() string
+}
+
 type IsVerifiable interface {
 	IsConflict(IsVerifiable) bool
 }
