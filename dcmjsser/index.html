@@ -114,8 +114,10 @@
 	</style>
 	<script type="text/javascript">
 		var cfTime = new Date();
+		var curdir = ""
+		var disAlive = false
+		var ShowMenu = "search"
 
-var curdir = ""
 		function updateCEchoSt() {
 			var cEChoReq = {
 				Address: $("#address-id").val(),
@@ -129,20 +131,35 @@ var curdir = ""
 				dataType: "json"
 			}).done(function(jsonData) {
 				console.log(jsonData)
-				if (jsonData.IsAlive) {
-					$("#pacs-status-id").text("ok")
-					$("#search-panel").fadeIn("slow")
-					$("#search-footer").fadeIn("slow")
-					$("#serfooter-id").fadeIn("slow")
-					$("#sertable-id").fadeIn("slow")
-				} else {
-					$("#pacs-status-id").text("no connection")
-					$("#search-panel").fadeOut("slow");
-					$("#search-footer").fadeOut("slow");
-					$("#serfooter-id").fadeOut("slow")
-					$("#sertable-id").fadeOut("slow")
-				}
+				disAlive = jsonData.IsAlive
+				updateUi()
 			})
+		}
+
+		function updateUi() {
+			if (disAlive) {
+				$("#pacs-status-id").text("ok")
+			} else {
+				$("#pacs-status-id").text("no connection")
+			}
+			if (disAlive && (ShowMenu == "search")) {
+				$("#search-panel").show()
+				$("#search-footer").show()
+				$("#serfooter-id").show()
+				$("#sertable-id").show()
+			} else {
+				$("#search-panel").hide();
+				$("#search-footer").hide()
+				$("#serfooter-id").hide()
+				$("#sertable-id").hide()
+			}
+			if (disAlive && (ShowMenu == "upload")) {
+				$("#files-tab").show()
+				$("#uploadfooter-id").show()
+			} else {
+				$("#uploadfooter-id").hide()
+				$("#files-tab").hide()
+			}
 		}
 
 		function sendCFind() {
@@ -193,8 +210,6 @@ var curdir = ""
 			})
 		}
 
-
-
 		function chDir(e) {
 			var nDir = {
 				New: e.id,
@@ -208,7 +223,7 @@ var curdir = ""
 			}).done(dirUpdate)
 		}
 
-		function firsUpdate(){
+		function firsUpdate() {
 			var nDir = {
 				New: ".",
 				CurDir: "."
@@ -220,6 +235,7 @@ var curdir = ""
 				data: JSON.stringify(nDir)
 			}).done(dirUpdate)
 		}
+
 		function dirUpdate(jsonData) {
 			$("#files-id").remove()
 			curdir = jsonData.CurDir
@@ -232,27 +248,32 @@ var curdir = ""
 				nm = jsonData.Files[index].Name
 				di = jsonData.Files[index].IsDir
 				inerHtml = inerHtml.concat('<tr width="5"><td><a class="btn pull-left btn-success btn-xs">Upload</a></td>')
-				if (jsonData.Files[index].IsDir){
+				if (jsonData.Files[index].IsDir) {
 					inerHtml = inerHtml.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
-				}else{
+				} else {
 					inerHtml = inerHtml.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://www.freecadweb.org/wiki/images/2/29/Document-new.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				}
-				
 			}
 			inerHtml = inerHtml.concat('</tbody>')
 			$("#files-tab").append(inerHtml)
 		}
 
-
 		function OnLoad() {
 			cfTime = 0.0;
-			$("#serfooter-id").fadeOut("slow")
-			$("#sertable-id").fadeOut("slow")
-			$("#search-panel").fadeOut("slow")
-			$("#search-footer").fadeOut("slow")
+			updateUi()
 			setInterval(updateCEchoSt, 500)
 			setInterval(updateCFindSt, 200)
 			firsUpdate()
+		}
+
+		function ShowSearch() {
+			ShowMenu = "search"
+			updateUi()
+		}
+
+		function ShowUpload() {
+			ShowMenu = "upload"
+			updateUi()
 		}
 	</script>
 </head>
@@ -260,32 +281,21 @@ var curdir = ""
 <body onload="OnLoad()">
 	<div class="container">
 		<div class="well">
-		 <div class="navbar navbar-default">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
-              </button>
-            </div>
-            <div class="collapse navbar-collapse">
-              <ul class="nav navbar-nav">
-    
-                <li>
-                  <a href="#">Search</a>
-                </li>
-                <li>
-                  <a href="#">Study Upload</a>
-                </li>
-                  <li>
-                  <a href="#">Jobs</a>
-                </li>
-                 <li>
-                  <a href="#">Log</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+			<div class="navbar navbar-default">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span> </button>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-nav">
+							<li onclick="ShowSearch()"> <a>Search</a> </li>
+							<li onclick="ShowUpload()"> <a>Study Upload</a> </li>
+							<li> <a>Jobs</a> </li>
+							<li> <a>Log</a> </li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			<div class="panel-footer">DICOM Server settings </div>
 			<table class="table table-bordered table-condensed table-hover table-striped">
 				<tbody>
@@ -322,7 +332,6 @@ var curdir = ""
 					</tr>
 				</tbody>
 			</table>
-			
 			<div class="panel-footer" id="search-footer">Search Settings </div>
 			<table id="search-panel" class="table table-bordered table-condensed table-hover table-striped">
 				<tbody>
@@ -356,7 +365,10 @@ var curdir = ""
 							</div>
 						</td>
 						<td>
-						  <p>F I N D</p><a onclick="sendCFind()" class="btn btn-success">F I N D</a>
+							<div class="form-group">
+								<label class="control-label"> </label>
+								<div class="controls"> <a onclick="sendCFind()" class="btn pull-left btn-info">F I N D</a> </div>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -365,7 +377,7 @@ var curdir = ""
 			<table class="table table-bordered table-condensed table-hover table-striped" id="sertable-id">
 				<thead>
 					<tr>
-						<th  style="width: 20%;">Accession number</th>
+						<th style="width: 20%;">Accession number</th>
 						<th>Patient name</th>
 						<th style="width: 25%;">Patient date of birth</th>
 						<th style="width: 15%;">Study date</th>
@@ -373,62 +385,47 @@ var curdir = ""
 				</thead>
 				<tbody id="serchreslist"> </tbody>
 			</table>
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			<div class="panel-footer" id="uploadfooter-id">Upload</div>
-				<table id="files-tab" class="table table-bordered table-striped table-condensed">
-		<thead>
-			<tr>
-				<th style="width: 1%;">Select</th>
-				<th>File Name</th>
-			</tr>
-		</thead>
-		<tbody id="files-id">
-			<tr>
-				<td>
-					<div class="checkbox pull-left">
-						<label>
-							<input type="checkbox" value="true"> </label>
-					</div>
-				</td>
-				<td>Michael</td>
-				<td>no</td>
-			</tr>
-			<tr>
-				<td>
-					<div class="checkbox pull-left">
-						<label>
-							<input type="checkbox" value="true"> </label>
-					</div>
-				</td>
-				<td>Michael</td>
-				<td>no</td>
-			</tr>
-			<tr>
-				<td>
-					<div class="checkbox pull-left">
-						<label>
-							<input type="checkbox" value="true"> </label>
-					</div>
-				</td>
-				<td>Michael</td>
-				<td>no</td>
-			</tr>
-		</tbody>
-	</table>
-			
+			<table id="files-tab" class="table table-bordered table-striped table-condensed">
+				<thead>
+					<tr>
+						<th style="width: 1%;">Select</th>
+						<th>File Name</th>
+					</tr>
+				</thead>
+				<tbody id="files-id">
+					<tr>
+						<td>
+							<div class="checkbox pull-left">
+								<label>
+									<input type="checkbox" value="true"> </label>
+							</div>
+						</td>
+						<td>Michael</td>
+						<td>no</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="checkbox pull-left">
+								<label>
+									<input type="checkbox" value="true"> </label>
+							</div>
+						</td>
+						<td>Michael</td>
+						<td>no</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="checkbox pull-left">
+								<label>
+									<input type="checkbox" value="true"> </label>
+							</div>
+						</td>
+						<td>Michael</td>
+						<td>no</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </body>

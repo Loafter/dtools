@@ -21,10 +21,16 @@ type CompDispatcher interface {
 type JobBallancer struct {
 	jChan    chan interface{}
 	acJob    map[string]Job
+	slJob    map[string]Job
 	errDisp  ErrDispatcher
 	jobDisp  JobDispatcher
 	compDisp CompDispatcher
 	JbDone   sync.WaitGroup
+	aJobC    int
+}
+
+func (jbal JobBallancer) checkInit() bool {
+	return (jbal.acJob == nil) && (jbal.jChan == nil) && (jbal.slJob == nil)
 }
 
 func (jbal *JobBallancer) startJob(jdat interface{}) {
@@ -52,9 +58,16 @@ func (jbal *JobBallancer) takeJob() {
 			return
 		case Job:
 			//regular dispath
-			jbal.addJob(job)
-			go jbal.startJob(job)
-			log.Println("info: normal dispatch")
+			if len(jbal.acJob) < jbal.aJobC {
+				jbal.JbDone.Add(1)
+				jbal.addActiveJob(job)
+				go jbal.startJob(job)
+				log.Println("info: normal dispatch")
+			} else {
+				jbal.addSleepJob(job)
+				jbal.JbDone.Add(1)
+				log.Println("info: attend maximum active job")
+			}
 		case CompJob:
 			//notify about sucess
 			if err := jbal.compDisp.DispatchSuccess(job); err != nil {
@@ -63,6 +76,7 @@ func (jbal *JobBallancer) takeJob() {
 			//remove success compleated job
 			jbal.removeJob(job.Job.JobId)
 			jbal.JbDone.Done()
+			jbal.resumeJobs()
 		case FaJob:
 			//notify about sucess
 			if err := jbal.errDisp.DispatchError(job); err != nil {
@@ -71,8 +85,9 @@ func (jbal *JobBallancer) takeJob() {
 			//remove success compleated job
 			jbal.removeJob(job.Job.JobId)
 			jbal.JbDone.Done()
+			jbal.resumeJobs()
 		default:
-			log.Println("error: unknown job type")
+			log.Fatalln("error: unknown job type")
 			jbal.JbDone.Done()
 		}
 	}
@@ -90,6 +105,7 @@ func (jbal *JobBallancer) removeJob(jid string) error {
 
 //remove successul complited job
 func (jbal *JobBallancer) getJobByID(jid string) (*Job, error) {
+
 	if val, isFind := jbal.acJob[jid]; isFind {
 		return &val, nil
 	} else {
@@ -98,12 +114,42 @@ func (jbal *JobBallancer) getJobByID(jid string) (*Job, error) {
 }
 
 //add job
-func (jbal *JobBallancer) addJob(job Job) error {
-	if jbal.acJob == nil {
+func (jbal *JobBallancer) addActiveJob(job Job) error {
+	if jbal.checkInit() {
 		return errors.New("error: job list not inited")
 	}
 	jbal.acJob[job.JobId] = job
 	return nil
+}
+func (jbal *JobBallancer) addSleepJob(job Job) error {
+	if jbal.checkInit() {
+		return errors.New("error: job list not inited")
+	}
+	jbal.slJob[job.JobId] = job
+	return nil
+}
+
+func min(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
+func (jbal *JobBallancer) resumeJobs() {
+	jbc := min(jbal.aJobC-len(jbal.acJob), len(jbal.slJob))
+	for val := range jbal.slJob {
+		if jbc > 0 {
+			jb := jbal.slJob[val]
+			delete(jbal.slJob, val)
+			jbal.JbDone.Done()
+			go jbal.PushJob(jb)
+		} else {
+
+			return
+		}
+		jbc--
+	}
+
 }
 
 //check if work confilct
@@ -123,18 +169,17 @@ func (jbal *JobBallancer) isConflictedJob(taskData interface{}) bool {
 }
 
 func (jbal *JobBallancer) PushJob(jdat interface{}) (string, error) {
-	if jbal.jChan == nil {
+	if jbal.checkInit() {
 		return "", errors.New("error: JobChan is not inited")
 	}
 	uid := genUid()
 	job := Job{JobId: uid, Data: jdat}
-	jbal.JbDone.Add(1)
 	jbal.jChan <- job
 	return uid, nil
 }
 
 func (jbal *JobBallancer) TerminateTakeJob() error {
-	if jbal.jChan == nil {
+	if jbal.checkInit() {
 		return errors.New("error: is not inited")
 	}
 	jbal.JbDone.Wait()
@@ -152,6 +197,8 @@ func (jbal *JobBallancer) Init(jdis JobDispatcher, cmd CompDispatcher, erd ErrDi
 	jbal.jobDisp = jdis
 	jbal.compDisp = cmd
 	jbal.acJob = make(map[string]Job)
+	jbal.slJob = make(map[string]Job)
+	jbal.aJobC = 10
 	jbal.jChan = make(chan interface{})
 	go jbal.takeJob()
 	log.Println("info: job ballancer inited")

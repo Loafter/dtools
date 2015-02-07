@@ -3,10 +3,11 @@ package main
 import "testing"
 import "log"
 import "time"
-import "errors"
-import "math"
 
-//import "strconv"
+/*import "errors"
+import "math"*/
+
+import "strconv"
 
 //import "fmt"
 
@@ -15,15 +16,15 @@ type TestJobDispatcher struct {
 }
 
 func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
-	time.Sleep(500 * time.Duration(test.i) * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	test.i++
 
 	log.Printf("info: try dispatch data %v", data)
-	if math.Mod(float64(test.i), 2) == 0.0 {
+	/*if math.Mod(float64(test.i), 2) == 0.0 {
 		return nil, errors.New("gen error")
-	} else {
-		return data, nil
-	}
+	} else {*/
+	return data, nil
+	//}
 }
 
 type TestErrorDispatcher struct {
@@ -42,21 +43,21 @@ func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompJob) error {
 	return nil
 }
 
-/*
 func TestJobBallancer(t *testing.T) {
-		testJobDispatcher := TestJobDispatcher{}
-		testErrorDispatcher := TestErrorDispatcher{}
-		testSuccessDispatcher := TestCompletedDispatcher{}
-		jobBallancer := JobBallancer{}
-		jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
-		for i := 0; i < 5; i++ {
-			jobBallancer.PushJob("is error" + strconv.Itoa(i))
-		}
+	testJobDispatcher := TestJobDispatcher{}
+	testErrorDispatcher := TestErrorDispatcher{}
+	testSuccessDispatcher := TestCompletedDispatcher{}
+	jobBallancer := JobBallancer{}
+	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
+	for i := 0; i < 500; i++ {
+		jobBallancer.PushJob("data: " + strconv.Itoa(i))
+	}
 
-		jobBallancer.TerminateTakeJob()
+	jobBallancer.TerminateTakeJob()
 
 }
 
+/*
 func TestDicomCEchoClient(t *testing.T) {
 		dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
 		dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
@@ -66,7 +67,7 @@ func TestDicomCEchoClient(t *testing.T) {
 			log.Printf("info: ping result %v", pingRes)
 		}
 }
-*/
+
 func TestDicomCFindClient(t *testing.T) {
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
 	disp := DDisp{dCln: dcomClient}
@@ -81,4 +82,4 @@ func TestDicomCFindClient(t *testing.T) {
 		}()
 	}
 	time.Sleep(time.Second * 100)
-}
+}*/
