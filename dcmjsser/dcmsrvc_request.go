@@ -12,7 +12,7 @@ type EchoReq struct {
 }
 
 func (ereq EchoReq) GetDescript() string {
-	return "C-Echo request: " + ereq.Address + ":" + strconv.Itoa(ereq.Port) + " AE_TITLE:" + ereq.ServerAE_Title
+	return "C-Echo request: " + ereq.Address + ":" + strconv.Itoa(ereq.Port) + " AE_TITLE: " + ereq.ServerAE_Title
 }
 
 func (ereq *EchoReq) InitFromJsonData(data []byte) error {
@@ -71,6 +71,9 @@ func (cstor *CStorReq) InitFromJsonData(data []byte) error {
 
 }
 
-func (cstor *CStorReq) GetDescript() string {
-	return "C-Store request: " + cstor.ServerSet.Address + ":" + strconv.Itoa(cstor.ServerSet.Port) + " " + cstor.File
+func (cstor CStorReq) GetDescript() string {
+	if len(cstor.File) > 40 {
+		cstor.File = cstor.File[len(cstor.File)-20 : len(cstor.File)-1]
+	}
+	return "C-Store request: " + cstor.ServerSet.Address + ":" + strconv.Itoa(cstor.ServerSet.Port) + " ..." + cstor.File
 }

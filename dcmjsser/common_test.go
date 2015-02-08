@@ -7,7 +7,7 @@ import "time"
 /*import "errors"
 import "math"*/
 
-import "strconv"
+//import "strconv"
 
 //import "fmt"
 
@@ -43,6 +43,7 @@ func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompJob) error {
 	return nil
 }
 
+/*
 func TestJobBallancer(t *testing.T) {
 	testJobDispatcher := TestJobDispatcher{}
 	testErrorDispatcher := TestErrorDispatcher{}
@@ -81,4 +82,14 @@ func TestDicomCFindClient(t *testing.T) {
 		}()
 	}
 	time.Sleep(time.Second * 6)
+}
+*/
+func TestDicomCStoreClient(t *testing.T) {
+	dicomCStoreRequest := CStorReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, File: "/home/andrew/Downloads/Dicom/ToSend/IM-0001-0041.dcm"}
+	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
+	if err := dcomClient.CStore(dicomCStoreRequest); err != nil {
+		t.Errorf("error: Test stop failed %v", err)
+	} else {
+		log.Printf("info: cstore result ")
+	}
 }

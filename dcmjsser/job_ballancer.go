@@ -221,9 +221,9 @@ func (jbal JobBallancer) GetJobsList() ([]string, error) {
 	}
 	for i := range jbal.slJob {
 		if de, ok := jbal.slJob[i].Data.(Descriptable); ok {
-			descr = append(descr, "sleped job: "+de.GetDescript())
+			descr = append(descr, "sleeping job: "+de.GetDescript())
 		} else {
-			descr = append(descr, "sleped job: this type job don't have description")
+			descr = append(descr, "sleeping job: this type job don't have description")
 		}
 
 	}

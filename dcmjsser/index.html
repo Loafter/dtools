@@ -117,7 +117,7 @@
 		var curdir = ""
 		var disAlive = false
 		var ShowMenu = "search"
-		var cUploadF=""
+		var cUploadF = ""
 
 		function updateCEchoSt() {
 			var cEChoReq = {
@@ -216,7 +216,6 @@
 				} else {
 					console.log("no need to update")
 				}
-
 			})
 		}
 
@@ -257,10 +256,11 @@
 			for (index in jsonData.Files) {
 				nm = jsonData.Files[index].Name
 				di = jsonData.Files[index].IsDir
-				inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a  onclick="sendCStore(this)" id="'+'fi'+nm +'" class="btn pull-left btn-success btn-xs">Upload</a></td>')
 				if (jsonData.Files[index].IsDir) {
+					inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a  onclick="sendCStore(this)" id="' + 'fi' + nm + '/" class="btn pull-left btn-success btn-xs">Upload</a></td>')
 					inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				} else {
+					inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a  onclick="sendCStore(this)" id="' + 'fi' + nm + '" class="btn pull-left btn-success btn-xs">Upload</a></td>')
 					inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://www.freecadweb.org/wiki/images/2/29/Document-new.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				}
 			}
@@ -282,16 +282,31 @@
 				$("#jobslist").append(inerHtmljobs)
 			})
 		}
-		
+
 		function sendCStore(e) {
-			console.log(curdir+'/'+ e.id.substring(2))
+			var fp = curdir + '/' + e.id.substring(2)
+			var csdat = {
+				ServerSet: {
+					Address: $("#address-id").val(),
+					Port: $("#port-id").val(),
+					ServerAE_Title: $("#aetitle-id").val()
+				},
+				File: fp,
+			}
+			console.log(csdat)
+			$.ajax({
+				url: "/c-ctore",
+				type: "POST",
+				data: JSON.stringify(csdat),
+				dataType: "json"
+			})
 		}
 
 		function OnLoad() {
 			cfTime = 0.0;
 			updateUi()
-			setInterval(updateCEchoSt, 500)
-			setInterval(updateCFindSt, 200)
+			setInterval(updateCEchoSt, 700)
+			setInterval(updateCFindSt, 400)
 			setInterval(updateJobs, 2000)
 			firsUpdate()
 		}
@@ -310,7 +325,6 @@
 			ShowMenu = "jobs"
 			updateJobs()
 			updateUi()
-			
 		}
 	</script>
 </head>
@@ -328,7 +342,6 @@
 							<li onclick="ShowSearch()"> <a>Search</a> </li>
 							<li onclick="ShowUpload()"> <a>Study Upload</a> </li>
 							<li onclick="ShowJobs()"> <a>Jobs</a> </li>
-							<li> <a>Log</a> </li>
 						</ul>
 					</div>
 				</div>
@@ -341,21 +354,23 @@
 							<div class="form-group">
 								<label class="control-label">DICOM server address</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="address-id"> </div>
+									<input type="text" class="form-control input-sm" id="address-id" value="213.165.94.158"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
 								<label class="control-label">AE-Title</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="aetitle-id"> </div>
+									<input type="text" class="form-control input-sm" id="aetitle-id" value="AE_GEPACS">
+								</div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
 								<label class="control-label">Port number</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="port-id"> </div>
+									<input type="text" class="form-control input-sm" id="port-id" value="104">
+								</div>
 							</div>
 						</td>
 						<td>

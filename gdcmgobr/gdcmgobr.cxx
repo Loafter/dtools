@@ -4,6 +4,7 @@
 #include "gdcmgobr.h"
 #include <sstream>
 #include "gdcmPrinter.h"
+#include <string>
 
 std::vector<bool> TestVec()
 {
@@ -100,27 +101,28 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-bool CStore (std::string remote, int portno, std::string aetitle, std::string call,std::string files)	
+bool CStore (std::string remote, int portno, std::string aetitle, std::string call,std::string file)	
 {
-	gdcm::Directory::FilenamesType filenames=split(files, ':');
 	gdcm::Directory::FilenamesType thefiles;
-    for( gdcm::Directory::FilenamesType::const_iterator file = filenames.begin();
-      file != filenames.end(); ++file )
-      {
-      if( gdcm::System::FileIsDirectory(file->c_str()) )
+	if (file.empty())
+	 return false;
+	char l=*file.end();
+      if(gdcm::System::FileIsDirectory(file.c_str()))
         {
+		std::cout<<"info: detect directory cstore mode"<<std::endl;
         gdcm::Directory::FilenamesType files;
         gdcm::Directory dir;
-        dir.Load(*file, true);
+        dir.Load(file, true);
         files = dir.GetFilenames();
         thefiles.insert(thefiles.end(), files.begin(), files.end());
         }
       else
         {
         // This is a file simply add it
-        thefiles.push_back(*file);
-        }
-      }
+		std::cout<<"info: detect file cstore mode"<<std::endl;
+        thefiles.push_back(file);
+     }
+  
     bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), call.c_str());
 
     gdcmDebugMacro( (didItWork ? "Store was successful." : "Store failed.") );
