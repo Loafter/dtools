@@ -168,14 +168,15 @@ func (jbal *JobBallancer) isConflictedJob(taskData interface{}) bool {
 	return false
 }
 
-func (jbal *JobBallancer) PushJob(jdat interface{}) (string, error) {
+func (jbal *JobBallancer) PushJob(jdat interface{}) error {
 	if jbal.checkInit() {
-		return "", errors.New("error: JobChan is not inited")
+		return errors.New("error: JobChan is not inited")
 	}
 	uid := genUid()
 	job := Job{JobId: uid, Data: jdat}
 	jbal.jChan <- job
-	return uid, nil
+	return nil
+
 }
 
 func (jbal *JobBallancer) TerminateTakeJob() error {

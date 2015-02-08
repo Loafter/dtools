@@ -12,7 +12,7 @@ type EchoReq struct {
 }
 
 func (ereq EchoReq) GetDescript() string {
-	return "C-Echo request  " + ereq.Address + ":" + strconv.Itoa(ereq.Port) + " AE_TITLE:" + ereq.ServerAE_Title
+	return "C-Echo request: " + ereq.Address + ":" + strconv.Itoa(ereq.Port) + " AE_TITLE:" + ereq.ServerAE_Title
 }
 
 func (ereq *EchoReq) InitFromJsonData(data []byte) error {
@@ -47,7 +47,7 @@ func (freq *FindReq) InitFromJsonData(data []byte) error {
 
 func (freq FindReq) GetDescript() string {
 	st := freq.PatientName + " " + freq.AccessionNumber + " " + freq.PatienDateOfBirth + " " + freq.StudyDate
-	return "C-Find request  " + freq.ServerSet.Address + ":" + strconv.Itoa(freq.ServerSet.Port) + st
+	return "C-Find request: " + freq.ServerSet.Address + ":" + strconv.Itoa(freq.ServerSet.Port) + " " + st
 }
 
 type FindRes struct {
@@ -55,4 +55,22 @@ type FindRes struct {
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
 	StudyDate         string `json:"StudyDate"`
+}
+
+type CStorReq struct {
+	ServerSet EchoReq
+	File      string `json:"File"`
+}
+
+func (cstor *CStorReq) InitFromJsonData(data []byte) error {
+	err := json.Unmarshal(data, &cstor)
+	if err != nil {
+		return errors.New("error: Can't parse dicom cStore request data")
+	}
+	return nil
+
+}
+
+func (cstor *CStorReq) GetDescript() string {
+	return "C-Store request: " + cstor.ServerSet.Address + ":" + strconv.Itoa(cstor.ServerSet.Port) + " " + cstor.File
 }

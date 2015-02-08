@@ -35,8 +35,8 @@ func (srv *DJsServ) Start(listenPort int) error {
 	http.HandleFunc("/c-echo", srv.cEcho)
 	http.HandleFunc("/c-find", srv.cFind)
 	http.HandleFunc("/c-finddat", srv.cFindData)
+	http.HandleFunc("/c-ctore", srv.cStore)
 	http.HandleFunc("/index.html", srv.index)
-	http.HandleFunc("/upload.html", srv.upload)
 	http.HandleFunc("/chd", srv.chd)
 	http.HandleFunc("/jobs", srv.jobs)
 	if err := http.ListenAndServe(":"+strconv.Itoa(listenPort), nil); err != nil {
@@ -63,7 +63,7 @@ func (srv *DJsServ) cEcho(rwr http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if _, err := srv.jbBal.PushJob(dec); err != nil {
+	if err := srv.jbBal.PushJob(dec); err != nil {
 		log.Printf("error: can't push job")
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
 		return
@@ -97,7 +97,7 @@ func (srv *DJsServ) cFind(rwr http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if _, err := srv.jbBal.PushJob(fr); err != nil {
+	if err := srv.jbBal.PushJob(fr); err != nil {
 		log.Printf("error: can't push job")
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
 		return
@@ -160,20 +160,6 @@ func (srv *DJsServ) index(rwr http.ResponseWriter, req *http.Request) {
 	rwr.Write(content)
 }
 
-//serve main page request
-func (srv *DJsServ) upload(rwr http.ResponseWriter, req *http.Request) {
-	rwr.Header().Set("Content-Type: text/html", "*")
-
-	content, err := ioutil.ReadFile("upload.html")
-	if err != nil {
-		log.Println("warning: upload page not found, return included page")
-		val, _ := base64.StdEncoding.DecodeString(htmlData)
-		rwr.Write(val)
-		return
-	}
-	rwr.Write(content)
-}
-
 func (srv *DJsServ) DispatchError(fjb FaJob) error {
 	log.Println("info: DispatchError")
 	log.Println(fjb.ErrorData)
@@ -188,7 +174,7 @@ func (srv *DJsServ) DispatchSuccess(cjb CompJob) error {
 	case []FindRes:
 		return srv.onCFindDone(result)
 	default:
-		log.Printf("unexpected job type %v", result)
+		log.Printf("info: unexpected job type %v", result)
 	}
 	return nil
 }
@@ -256,4 +242,29 @@ func (srv *DJsServ) chd(rwr http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rwr.Write(js)
+}
+
+func (srv *DJsServ) cStore(rwr http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	bodyData, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		strErr := "error: Can't read http body data"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+	var cstr CStorReq
+	if err := json.Unmarshal(bodyData, &cstr); err != nil {
+		strErr := "error: can't parse c-strore date"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+	if err := srv.jbBal.PushJob(cstr); err != nil {
+		log.Printf("error: can't push job")
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		return
+
+	}
+	rwr.Write([]byte{0})
 }

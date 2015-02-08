@@ -49,7 +49,7 @@ func TestJobBallancer(t *testing.T) {
 	testSuccessDispatcher := TestCompletedDispatcher{}
 	jobBallancer := JobBallancer{}
 	jobBallancer.Init(&testJobDispatcher, &testSuccessDispatcher, &testErrorDispatcher)
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 40; i++ {
 		jobBallancer.PushJob("data: " + strconv.Itoa(i))
 	}
 
@@ -57,21 +57,20 @@ func TestJobBallancer(t *testing.T) {
 
 }
 
-/*
 func TestDicomCEchoClient(t *testing.T) {
-		dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
-		dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
-		if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
-			t.Errorf("error: Test stop failed %v", err)
-		} else {
-			log.Printf("info: ping result %v", pingRes)
-		}
+	dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
+	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
+	if pingRes, err := dcomClient.CEcho(dicomCEchoRequest); err != nil {
+		t.Errorf("error: Test stop failed %v", err)
+	} else {
+		log.Printf("info: ping result %v", pingRes)
+	}
 }
 
 func TestDicomCFindClient(t *testing.T) {
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
 	disp := DDisp{dCln: dcomClient}
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 10; i++ {
 		dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "A*"}
 		go func() {
 			if result, err := disp.Dispatch(dicomCFindRequest); err != nil {
@@ -81,5 +80,5 @@ func TestDicomCFindClient(t *testing.T) {
 			}
 		}()
 	}
-	time.Sleep(time.Second * 100)
-}*/
+	time.Sleep(time.Second * 6)
+}

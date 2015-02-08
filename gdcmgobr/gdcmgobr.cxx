@@ -85,3 +85,44 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
 	return reqRes;
 }
 
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
+bool CStore (std::string remote, int portno, std::string aetitle, std::string call,std::string files)	
+{
+	gdcm::Directory::FilenamesType filenames=split(files, ':');
+	gdcm::Directory::FilenamesType thefiles;
+    for( gdcm::Directory::FilenamesType::const_iterator file = filenames.begin();
+      file != filenames.end(); ++file )
+      {
+      if( gdcm::System::FileIsDirectory(file->c_str()) )
+        {
+        gdcm::Directory::FilenamesType files;
+        gdcm::Directory dir;
+        dir.Load(*file, true);
+        files = dir.GetFilenames();
+        thefiles.insert(thefiles.end(), files.begin(), files.end());
+        }
+      else
+        {
+        // This is a file simply add it
+        thefiles.push_back(*file);
+        }
+      }
+    bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), call.c_str());
+
+    gdcmDebugMacro( (didItWork ? "Store was successful." : "Store failed.") );
+    return didItWork ? 0 : 1;
+}

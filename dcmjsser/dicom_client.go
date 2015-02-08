@@ -17,7 +17,16 @@ func (dc *DClient) checRequisites() error {
 	return nil
 }
 
-func (dc *DClient) CStore() error {
+func (dc *DClient) CStore(cStorReq CStorReq) error {
+	cae := dc.CallerAE_Title
+	sae := cStorReq.ServerSet.ServerAE_Title
+	ip := cStorReq.ServerSet.Address
+	port := cStorReq.ServerSet.Port
+	fls := cStorReq.File
+	isStore := gdcmgobr.CStore(ip, port, sae, cae, fls)
+	if !isStore {
+		return errors.New("error: Can't store dicom file " + fls)
+	}
 	return nil
 }
 

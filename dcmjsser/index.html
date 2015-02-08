@@ -117,6 +117,7 @@
 		var curdir = ""
 		var disAlive = false
 		var ShowMenu = "search"
+		var cUploadF=""
 
 		function updateCEchoSt() {
 			var cEChoReq = {
@@ -256,7 +257,7 @@
 			for (index in jsonData.Files) {
 				nm = jsonData.Files[index].Name
 				di = jsonData.Files[index].IsDir
-				inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a class="btn pull-left btn-success btn-xs">Upload</a></td>')
+				inerHtmlfiles = inerHtmlfiles.concat('<tr width="5"><td><a  onclick="sendCStore(this)" id="'+'fi'+nm +'" class="btn pull-left btn-success btn-xs">Upload</a></td>')
 				if (jsonData.Files[index].IsDir) {
 					inerHtmlfiles = inerHtmlfiles.concat('<td onclick="chDir(this)" ' + 'id="' + nm + '"><img src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Blue_folder_seth_yastrov_01.svg" width="30" alt="lorem">' + nm + '</td></tr>')
 				} else {
@@ -280,6 +281,10 @@
 				}
 				$("#jobslist").append(inerHtmljobs)
 			})
+		}
+		
+		function sendCStore(e) {
+			console.log(curdir+'/'+ e.id.substring(2))
 		}
 
 		function OnLoad() {
