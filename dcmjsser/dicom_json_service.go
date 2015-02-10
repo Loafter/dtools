@@ -167,15 +167,16 @@ func (srv *DJsServ) DispatchError(fjb FaJob) error {
 }
 
 func (srv *DJsServ) DispatchSuccess(cjb CompJob) error {
-	log.Print("info: dispatch success")
-	log.Println(cjb)
+	log.Printf("info: dispatch success %v", cjb)
 	switch result := cjb.ResultData.(type) {
 	case EchoRes:
 		return srv.onCEchoDone(result)
 	case []FindRes:
 		return srv.onCFindDone(result)
+	case CStorReq:
+		log.Printf("info: cstore succesuly complete %v", result)
 	default:
-		log.Printf("info: unexpected job type %v", result)
+		log.Printf("warning: unexpected job type %v", result)
 	}
 	return nil
 }

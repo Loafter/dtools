@@ -17,7 +17,7 @@ func (dc *DClient) checRequisites() error {
 	return nil
 }
 
-func (dc *DClient) CStore(cStorReq CStorReq) error {
+func (dc *DClient) CStore(cStorReq CStorReq) (interface{}, error) {
 	cae := dc.CallerAE_Title
 	sae := cStorReq.ServerSet.ServerAE_Title
 	ip := cStorReq.ServerSet.Address
@@ -25,9 +25,9 @@ func (dc *DClient) CStore(cStorReq CStorReq) error {
 	fls := cStorReq.File
 	isStore := gdcmgobr.CStore(ip, port, sae, cae, fls)
 	if !isStore {
-		return errors.New("error: Can't store dicom file " + fls)
+		return nil, errors.New("error: Can't store dicom file " + fls)
 	}
-	return nil
+	return cStorReq, nil
 }
 
 func (dc *DClient) CGet() error {
@@ -47,7 +47,7 @@ func (dc *DClient) CFind(freq FindReq) (interface{}, error) {
 	an := freq.AccessionNumber
 	bd := freq.PatienDateOfBirth
 	sd := freq.StudyDate
-	cfindResult := gdcmgobr.CFind(cae, sae, ip, port, pn, an, bd, sd)
+	cfindResult := gdcmgobr.CFind(sae, cae, ip, port, pn, an, bd, sd)
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)
 	if err != nil {
@@ -59,6 +59,7 @@ func (dc *DClient) CEcho(dicomCEchoRequest EchoReq) (EchoRes, error) {
 	if err := dc.checRequisites(); err != nil {
 		return EchoRes{}, err
 	}
+	//	log.Printf("info: dicomCEchoRequest.ServerAE_Title=%v dc.CallerAE_Title=%v ",dicomCEchoRequest.ServerAE_Title, dc.CallerAE_Title)
 	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dicomCEchoRequest.ServerAE_Title, dc.CallerAE_Title)
 	dicomCEchoResult := EchoRes{IsAlive: isAlive}
 	return dicomCEchoResult, nil

@@ -32,7 +32,7 @@ bool CEcho (std::string remote, int portno, std::string aetitle,std::string call
   return buffer;
 }
 
-std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,
+std::string CFind(std::string aetitle,std::string call,std::string hostname,int port ,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
 			std::string StudyDate)
 {	
@@ -62,8 +62,9 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
         " Please try again." << std::endl;
       return "";
       } 
+
 	 std::vector<gdcm::DataSet> theDataSet;
-    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet,  callingaetitle.c_str(),callaetitle.c_str()) )
+    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet, aetitle.c_str(),call.c_str()) )
       {
 		std::cout<<"cfind err";
         return "[]";
@@ -109,7 +110,7 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
 	char l=*file.end();
       if(gdcm::System::FileIsDirectory(file.c_str()))
         {
-		std::cout<<"info: detect directory cstore mode"<<std::endl;
+		//std::cout<<"info: detect directory cstore mode"<<std::endl;
         gdcm::Directory::FilenamesType files;
         gdcm::Directory dir;
         dir.Load(file, true);
@@ -119,10 +120,10 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
       else
         {
         // This is a file simply add it
-		std::cout<<"info: detect file cstore mode"<<std::endl;
+		//std::cout<<"info: detect file cstore mode"<<std::endl;
         thefiles.push_back(file);
      }
-  
+  	//std::cout<<remote.c_str()<<"   "<<portno<<"   "<<aetitle<<"   "<<call<<std::endl;
     bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), call.c_str());
 
     gdcmDebugMacro( (didItWork ? "Store was successful." : "Store failed.") );

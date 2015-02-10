@@ -11,7 +11,7 @@ func (dsp *DDisp) Dispatch(dreq interface{}) (interface{}, error) {
 
 	switch tr := dreq.(type) {
 	case CStorReq:
-		return nil, dsp.dCln.CStore(tr)
+		return dsp.dCln.CStore(tr)
 	case EchoReq:
 		return dsp.dCln.CEcho(tr)
 	case FindReq:
