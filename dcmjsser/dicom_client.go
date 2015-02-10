@@ -4,8 +4,6 @@ import "errors"
 import "dtools/gdcmgobr"
 import "encoding/json"
 
-//import "log"
-
 type DClient struct {
 	CallerAE_Title string
 }
@@ -17,7 +15,10 @@ func (dc *DClient) checRequisites() error {
 	return nil
 }
 
-func (dc *DClient) CStore(cStorReq CStorReq) (interface{}, error) {
+func (dc *DClient) CStore(cStorReq CStorReq) (CStorReq, error) {
+	if err := dc.checRequisites(); err != nil {
+		return CStorReq{}, err
+	}
 	cae := dc.CallerAE_Title
 	sae := cStorReq.ServerSet.ServerAE_Title
 	ip := cStorReq.ServerSet.Address
@@ -25,20 +26,35 @@ func (dc *DClient) CStore(cStorReq CStorReq) (interface{}, error) {
 	fls := cStorReq.File
 	isStore := gdcmgobr.CStore(ip, port, sae, cae, fls)
 	if !isStore {
-		return nil, errors.New("error: Can't store dicom file " + fls)
+		return CStorReq{}, errors.New("error: can't store dicom file " + fls)
 	}
 	return cStorReq, nil
 }
 
-func (dc *DClient) CGet() error {
-	return nil
+func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
+	if err := dc.checRequisites(); err != nil {
+		return CGetReq{}, err
+	}
+	cae := dc.CallerAE_Title
+	sae := cgt.FindReq.ServerSet.ServerAE_Title
+	ip := cgt.FindReq.ServerSet.Address
+	port := cgt.FindReq.ServerSet.Port
+	pn := cgt.FindReq.PatientName
+	an := cgt.FindReq.AccessionNumber
+	bd := cgt.FindReq.PatienDateOfBirth
+	sd := cgt.FindReq.StudyDate
+	fp := cgt.Folder
+	cget := gdcmgobr.CGet(sae, cae, ip, port, pn, an, bd, sd, fp)
+	if !cget {
+		return CGetReq{}, errors.New("error: can't cget dicom file " + pn)
+	}
+	return cgt, nil
 }
 
-func (dc *DClient) CMove() error {
-	return nil
-}
-
-func (dc *DClient) CFind(freq FindReq) (interface{}, error) {
+func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
+	if err := dc.checRequisites(); err != nil {
+		return nil, err
+	}
 	cae := dc.CallerAE_Title
 	sae := freq.ServerSet.ServerAE_Title
 	ip := freq.ServerSet.Address
@@ -51,7 +67,7 @@ func (dc *DClient) CFind(freq FindReq) (interface{}, error) {
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)
 	if err != nil {
-		return nil, errors.New("error: Can't parse dicom cFind result data " + err.Error() + cfindResult)
+		return nil, errors.New("error: can't parse dicom cFind result data " + err.Error() + cfindResult)
 	}
 	return fdat, nil
 }

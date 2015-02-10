@@ -11,9 +11,18 @@ std::vector<bool> TestVec()
 	std::vector<bool> cfindResult;
 	return cfindResult;
 }
+static uint16_t CSPPort=50000;
+uint16_t getCSPPort()
+{
+uint16_t retval=CSPPort;
+++CSPPort;
+if (CSPPort>51000)
+		CSPPort=50000;
+return retval;
+}
 
 bool CEcho (std::string remote, int portno, std::string aetitle,std::string call){
-	return gdcm::CompositeNetworkFunctions::CEcho(remote.c_str(),portno,aetitle.c_str(),call.c_str());
+	return gdcm::CompositeNetworkFunctions::CEcho(remote.c_str(),portno,aetitle.c_str(),NULL);
 }
  std::string GetStringValueFromTag(const gdcm::Tag t, const gdcm::DataSet ds)
 {
@@ -31,6 +40,42 @@ bool CEcho (std::string remote, int portno, std::string aetitle,std::string call
   // Since return is a const char* the very first \0 will be considered
   return buffer;
 }
+
+
+bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,
+			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
+			std::string StudyDate,std::string SFolder)
+{	
+    std::vector< std::pair<gdcm::Tag, std::string> > keys;
+    		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0010),PatientName));
+		keys.push_back(std::make_pair(gdcm::Tag(0x0008,0x0050),AccessionNumber)); 
+		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0030),PatienDateOfBirth));
+		keys.push_back(std::make_pair(gdcm::Tag(0x0008,0x0020),StudyDate));
+
+    gdcm::ERootType theRoot = gdcm::eStudyRootType;
+    gdcm::EQueryLevel theLevel = gdcm::eStudy;
+ 
+    gdcm::SmartPointer<gdcm::BaseRootQuery> theQuery = gdcm::CompositeNetworkFunctions::ConstructQuery(theRoot, theLevel ,keys);
+
+    if (!theQuery)
+      {
+      std::cerr << "Query construction failed." <<std::endl;
+      return false;
+      }
+
+	;
+    //doing a non-strict query, the second parameter there.
+    //look at the base query comments
+    if (!theQuery->ValidateQuery(false))
+      {
+      std::cerr << "You have not constructed a valid find query. Please try again." << std::endl;
+      return false;
+      } 
+
+   return gdcm::CompositeNetworkFunctions::CMove(hostname.c_str(), (uint16_t)port, theQuery,getCSPPort(), aetitle.c_str(),NULL,SFolder.c_str());
+  
+}
+
 
 std::string CFind(std::string aetitle,std::string call,std::string hostname,int port ,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
@@ -64,7 +109,7 @@ std::string CFind(std::string aetitle,std::string call,std::string hostname,int 
       } 
 
 	 std::vector<gdcm::DataSet> theDataSet;
-    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet, aetitle.c_str(),call.c_str()) )
+    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet, aetitle.c_str(),NULL) )
       {
 		std::cout<<"cfind err";
         return "[]";
@@ -124,8 +169,7 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
         thefiles.push_back(file);
      }
   	//std::cout<<remote.c_str()<<"   "<<portno<<"   "<<aetitle<<"   "<<call<<std::endl;
-    bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), call.c_str());
-
+    bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), NULL);
     gdcmDebugMacro( (didItWork ? "Store was successful." : "Store failed.") );
-    return didItWork ? 0 : 1;
+    return didItWork;
 }

@@ -191,6 +191,19 @@
 			})
 		}
 
+		function createUUID() {
+			// http://www.ietf.org/rfc/rfc4122.txt
+			var s = [];
+			var hexDigits = "0123456789ABCDEF";
+			for (var i = 0; i < 32; i++) {
+				s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+			}
+			s[12] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+			s[16] = hexDigits.substr((s[16] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+			var uuid = s.join("");
+			return uuid;
+		}
+
 		function updateCFindSt() {
 			$.ajax({
 				url: "/c-finddat",
@@ -208,7 +221,14 @@
 						pd = jsonData.CfindRes[index].PatienDateOfBirth
 						sd = jsonData.CfindRes[index].StudyDate
 						pn = jsonData.CfindRes[index].PatientName
-						inerHtml = inerHtml.concat('<tr id="access' + an + '"><td>' + an + '</td><td>' + pn + '</td><td>' + pd + '</td><td>' + sd + '</td></tr>')
+						gu = createUUID()
+						inerHtml = inerHtml.concat('<tr>')
+						inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Download</a></td>')
+						inerHtml = inerHtml.concat('<td id="' + 'an' + gu + '" >' + an + '</td>')
+						inerHtml = inerHtml.concat('<td id="' + 'pn' + gu + '" >' + pn + '</td>')
+						inerHtml = inerHtml.concat('<td id="' + 'pd' + gu + '" >' + pd + '</td>')
+						inerHtml = inerHtml.concat('<td id="' + 'sd' + gu + '" >' + sd + '</td>')
+						inerHtml = inerHtml.concat('</tr>')
 					}
 					inerHtml = inerHtml.concat(' </tbody>')
 					$("#sertable-id").append(inerHtml)
@@ -281,6 +301,17 @@
 				}
 				$("#jobslist").append(inerHtmljobs)
 			})
+		}
+
+		function sendCGet(e) {
+			an = $("#an" + e.id).text()
+			pn = $("#pn" + e.id).text()
+			pd = $("#pd" + e.id).text()
+			sd = $("#sd" + e.id).text()
+			console.log(an)
+			console.log(pn)
+			console.log(pd)
+			console.log(sd)
 		}
 
 		function sendCStore(e) {
@@ -362,16 +393,14 @@
 							<div class="form-group">
 								<label class="control-label">AE-Title</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="aetitle-id" value="AE_GEPACS">
-								</div>
+									<input type="text" class="form-control input-sm" id="aetitle-id" value="AE_GEPACS"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
 								<label class="control-label">Port number</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="port-id" value="104">
-								</div>
+									<input type="text" class="form-control input-sm" id="port-id" value="104"> </div>
 							</div>
 						</td>
 						<td>
@@ -430,6 +459,7 @@
 			<table class="table table-bordered table-condensed table-hover table-striped" id="sertable-id">
 				<thead>
 					<tr>
+						<th style="width: 1%;">Save</th>
 						<th style="width: 20%;">Accession number</th>
 						<th>Patient name</th>
 						<th style="width: 25%;">Patient date of birth</th>

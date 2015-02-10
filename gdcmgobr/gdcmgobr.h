@@ -10,4 +10,7 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
 std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
 			std::string StudyDate);
+bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,
+			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
+			std::string StudyDate,std::string SFolder);
 #endif

@@ -77,3 +77,21 @@ func (cstor CStorReq) GetDescript() string {
 	}
 	return "C-Store request: " + cstor.ServerSet.Address + ":" + strconv.Itoa(cstor.ServerSet.Port) + " ..." + cstor.File
 }
+
+type CGetReq struct {
+	FindReq FindReq
+	Folder  string `json:"File"`
+}
+
+func (cgt *CGetReq) InitFromJsonData(data []byte) error {
+	err := json.Unmarshal(data, &cgt)
+	if err != nil {
+		return errors.New("error: Can't parse dicom cStore request data")
+	}
+	return nil
+}
+
+func (cgt CGetReq) GetDescript() string {
+	st := cgt.FindReq.PatientName + " " + cgt.FindReq.AccessionNumber + " " + cgt.FindReq.PatienDateOfBirth + " " + cgt.FindReq.StudyDate
+	return "C-Get request: " + st
+}

@@ -37,10 +37,10 @@ func (jbal *JobBallancer) startJob(jdat interface{}) {
 	job := jdat.(Job)
 	dispResult, err := jbal.jobDisp.Dispatch(job.Data)
 	if err != nil {
-		//log.Println("info: failed job detected")
+		log.Println("info: failed job detected")
 		jbal.jChan <- FaJob{Job: job, ErrorData: err}
 	} else {
-		//log.Printf("info: completed job detected %v", dispResult)
+		log.Printf("info: completed job detected %v", dispResult)
 		jbal.jChan <- CompJob{Job: job, ResultData: dispResult}
 	}
 
@@ -50,11 +50,11 @@ func (jbal *JobBallancer) takeJob() {
 	for {
 		//extract job from queue
 		recivedTask := <-jbal.jChan
-		//log.Println("info: job taken")
+		log.Println("info: job taken")
 		switch job := recivedTask.(type) {
 		case TermJob:
 			//if we recive terminate signal need return
-			//log.Println("info: recive terminate dispatch singal")
+			log.Println("info: recive terminate dispatch singal")
 			return
 		case Job:
 			//regular dispath
@@ -62,11 +62,11 @@ func (jbal *JobBallancer) takeJob() {
 				jbal.JbDone.Add(1)
 				jbal.addActiveJob(job)
 				go jbal.startJob(job)
-				//log.Println("info: normal dispatch")
+				log.Println("info: normal dispatch")
 			} else {
 				jbal.addSleepJob(job)
 				jbal.JbDone.Add(1)
-				//log.Println("info: attend maximum active job")
+				log.Println("info: attend maximum active job")
 			}
 		case CompJob:
 			//notify about sucess
@@ -151,23 +151,6 @@ func (jbal *JobBallancer) resumeJobs() {
 	}
 
 }
-
-//check if work confilct
-func (jbal *JobBallancer) isConflictedJob(taskData interface{}) bool {
-	/*if _, ok := taskData.(IsVerifiable); !ok {
-		errors.New("warning: this task date is not verifiable")
-		return false
-	}
-	for _, job := range jbal.activeJob {
-		if ver, ok := job.(IsVerifiable); !ok {
-			if ver.IsConflict(ver) {
-				return true
-			}
-		}
-	}*/
-	return false
-}
-
 func (jbal *JobBallancer) PushJob(jdat interface{}) error {
 	if jbal.checkInit() {
 		return errors.New("error: JobChan is not inited")
@@ -189,7 +172,7 @@ func (jbal *JobBallancer) TerminateTakeJob() error {
 	if len(jbal.acJob) > 0 {
 		return errors.New("error: list job is not empty")
 	}
-	//log.Println("info: greacefully terminate take job")
+	log.Println("info: greacefully terminate take job")
 	return nil
 }
 
@@ -202,7 +185,7 @@ func (jbal *JobBallancer) Init(jdis JobDispatcher, cmd CompDispatcher, erd ErrDi
 	jbal.aJobC = 10
 	jbal.jChan = make(chan interface{})
 	go jbal.takeJob()
-	//log.Println("info: job ballancer inited")
+	log.Println("info: job ballancer inited")
 }
 
 func (jbal JobBallancer) GetJobsList() ([]string, error) {

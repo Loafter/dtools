@@ -10,6 +10,8 @@ type DDisp struct {
 func (dsp *DDisp) Dispatch(dreq interface{}) (interface{}, error) {
 
 	switch tr := dreq.(type) {
+	case CGetReq:
+		return dsp.dCln.CGet(tr)
 	case CStorReq:
 		return dsp.dCln.CStore(tr)
 	case EchoReq:
