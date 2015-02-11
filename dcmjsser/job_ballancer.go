@@ -142,7 +142,7 @@ func (jbal *JobBallancer) resumeJobs() {
 			jb := jbal.slJob[val]
 			delete(jbal.slJob, val)
 			jbal.JbDone.Done()
-			go jbal.PushJob(jb)
+			go jbal.PushJob(jb.Data)
 		} else {
 
 			return

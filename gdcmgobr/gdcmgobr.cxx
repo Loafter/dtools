@@ -71,8 +71,9 @@ bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,
       std::cerr << "You have not constructed a valid find query. Please try again." << std::endl;
       return false;
       } 
-
-   return gdcm::CompositeNetworkFunctions::CMove(hostname.c_str(), (uint16_t)port, theQuery,getCSPPort(), aetitle.c_str(),NULL,SFolder.c_str());
+	uint16_t cscp=getCSPPort();
+	std::cout<<"portcsp:"<<cscp;
+   return gdcm::CompositeNetworkFunctions::CMove(hostname.c_str(), (uint16_t)port,theQuery,cscp, aetitle.c_str(),NULL,SFolder.c_str());
   
 }
 
