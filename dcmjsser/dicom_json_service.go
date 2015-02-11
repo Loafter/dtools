@@ -34,6 +34,7 @@ func (srv *DJsServ) Start(listenPort int) error {
 	srv.dDisp.dCln.CallerAE_Title = "AE_DTOOLS"
 	http.HandleFunc("/c-echo", srv.cEcho)
 	http.HandleFunc("/c-find", srv.cFind)
+	http.HandleFunc("/c-get", srv.cGet)
 	http.HandleFunc("/c-finddat", srv.cFindData)
 	http.HandleFunc("/c-ctore", srv.cStore)
 	http.HandleFunc("/index.html", srv.index)
@@ -99,6 +100,33 @@ func (srv *DJsServ) cFind(rwr http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := srv.jbBal.PushJob(fr); err != nil {
+		log.Printf("error: can't push job")
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		return
+
+	}
+	//return non error empty data
+	rwr.Write([]byte{0})
+}
+
+func (srv *DJsServ) cGet(rwr http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	bodyData, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		strErr := "error: Can't read http body data"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+	var cg CGetReq
+	if err := json.Unmarshal(bodyData, &cg); err != nil {
+		strErr := "error: can't parse cGet data"
+		http.Error(rwr, err.Error(), http.StatusInternalServerError)
+		log.Println(strErr)
+		return
+	}
+
+	if err := srv.jbBal.PushJob(cg); err != nil {
 		log.Printf("error: can't push job")
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
 		return
