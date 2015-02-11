@@ -80,7 +80,7 @@ func (cstor CStorReq) GetDescript() string {
 
 type CGetReq struct {
 	FindReq FindReq
-	Folder  string `json:"File"`
+	Folder  string `json:"Folder"`
 }
 
 func (cgt *CGetReq) InitFromJsonData(data []byte) error {

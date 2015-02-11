@@ -3,6 +3,7 @@ package main
 import "errors"
 import "dtools/gdcmgobr"
 import "encoding/json"
+import "log"
 
 type DClient struct {
 	CallerAE_Title string
@@ -44,6 +45,7 @@ func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
 	bd := cgt.FindReq.PatienDateOfBirth
 	sd := cgt.FindReq.StudyDate
 	fp := cgt.Folder
+	log.Println(sae, cae, ip, port, pn, an, bd, sd, fp)
 	cget := gdcmgobr.CGet(sae, cae, ip, port, pn, an, bd, sd, fp)
 	if !cget {
 		return CGetReq{}, errors.New("error: can't cget dicom file " + pn)

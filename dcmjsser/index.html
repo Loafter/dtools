@@ -131,7 +131,6 @@
 				data: JSON.stringify(cEChoReq),
 				dataType: "json"
 			}).done(function(jsonData) {
-				console.log(jsonData)
 				disAlive = jsonData.IsAlive
 				updateUi()
 			})
@@ -234,7 +233,7 @@
 					$("#sertable-id").append(inerHtml)
 					console.log(jsonData.CfindRes)
 				} else {
-					console.log("no need to update")
+					//console.log("no need to update")
 				}
 			})
 		}
@@ -308,10 +307,29 @@
 			pn = $("#pn" + e.id).text()
 			pd = $("#pd" + e.id).text()
 			sd = $("#sd" + e.id).text()
-			console.log(an)
-			console.log(pn)
-			console.log(pd)
-			console.log(sd)
+			
+			var cfdat = {
+				ServerSet: {
+					Address: $("#address-id").val(),
+					Port: $("#port-id").val(),
+					ServerAE_Title: $("#aetitle-id").val()
+				},
+				PatientName: pn,
+				AccessionNumber:an,
+				PatienDateOfBirth:pd,
+				StudyDate: sd
+			}
+			var cg ={
+				FindReq: cfdat ,
+				Folder:curdir
+			}
+		console.log(cg)
+		$.ajax({
+				url: "/c-get",
+				type: "POST",
+				data: JSON.stringify(cg),
+				dataType: "json"
+			})
 		}
 
 		function sendCStore(e) {
