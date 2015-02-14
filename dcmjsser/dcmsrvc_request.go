@@ -26,6 +26,7 @@ func (ereq *EchoReq) InitFromJsonData(data []byte) error {
 
 type FindReq struct {
 	ServerSet         EchoReq
+	StudyInstanceUID  string `json:"StudyInstanceUID"`
 	PatientName       string `json:"PatientName"`
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
@@ -51,6 +52,7 @@ func (freq FindReq) GetDescript() string {
 }
 
 type FindRes struct {
+	StudyInstanceUID  string `json:"StudyInstanceUID"`
 	PatientName       string `json:"PatientName"`
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`

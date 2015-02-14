@@ -115,7 +115,7 @@
 	<script type="text/javascript">
 		var cfTime = new Date();
 		var curdir = ""
-		var disAlive = false
+		var disAlive = true
 		var ShowMenu = "search"
 		var cUploadF = ""
 
@@ -177,6 +177,7 @@
 					Port: $("#port-id").val(),
 					ServerAE_Title: $("#aetitle-id").val()
 				},
+				StudyInstanceUID: $("#st-inst-uid").val(),
 				PatientName: $("#patient-name-id").val(),
 				AccessionNumber: $("#accession-number-id").val(),
 				PatienDateOfBirth: $("#date-birth-id").val(),
@@ -220,9 +221,11 @@
 						pd = jsonData.CfindRes[index].PatienDateOfBirth
 						sd = jsonData.CfindRes[index].StudyDate
 						pn = jsonData.CfindRes[index].PatientName
+						stuid=jsonData.CfindRes[index].StudyInstanceUID
 						gu = createUUID()
 						inerHtml = inerHtml.concat('<tr>')
 						inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Download</a></td>')
+						inerHtml = inerHtml.concat('<td id="' + 'stuid' + gu + '" >' + stuid + '</td>')
 						inerHtml = inerHtml.concat('<td id="' + 'an' + gu + '" >' + an + '</td>')
 						inerHtml = inerHtml.concat('<td id="' + 'pn' + gu + '" >' + pn + '</td>')
 						inerHtml = inerHtml.concat('<td id="' + 'pd' + gu + '" >' + pd + '</td>')
@@ -303,6 +306,7 @@
 		}
 
 		function sendCGet(e) {
+			stduid= $("#stuid" + e.id).text()
 			an = $("#an" + e.id).text()
 			pn = $("#pn" + e.id).text()
 			pd = $("#pd" + e.id).text()
@@ -314,6 +318,7 @@
 					Port: $("#port-id").val(),
 					ServerAE_Title: $("#aetitle-id").val()
 				},
+				StudyInstanceUID:stduid,
 				PatientName: pn,
 				AccessionNumber:an,
 				PatienDateOfBirth:pd,
@@ -354,8 +359,8 @@
 		function OnLoad() {
 			cfTime = 0.0;
 			updateUi()
-			updateCEchoSt()
-			setInterval(updateCEchoSt, 700)
+			//updateCEchoSt()
+			//setInterval(updateCEchoSt, 1700)
 			setInterval(updateCFindSt, 400)
 			setInterval(updateJobs, 2000)
 			firsUpdate()
@@ -404,14 +409,14 @@
 							<div class="form-group">
 								<label class="control-label">DICOM server address</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="address-id" value="213.165.94.158"> </div>
+									<input type="text" class="form-control input-sm" id="address-id" value="192.168.1.9"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
 								<label class="control-label">AE-Title</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="aetitle-id" value="AE_GEPACS"> </div>
+									<input type="text" class="form-control input-sm" id="aetitle-id" value="AE_ARCH1"> </div>
 							</div>
 						</td>
 						<td>
@@ -438,11 +443,13 @@
 					<tr>
 						<td>
 							<div class="form-group">
-								<label class="control-label">Patient name</label>
+								<label class="control-label">Study Instance UID</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="patient-name-id"> </div>
+									<input type="text" class="form-control input-sm" id="st-inst-uid"> </div>
 							</div>
-						</td>
+						</td>						
+						
+						
 						<td>
 							<div class="form-group">
 								<label class="control-label">Accession number</label>
@@ -450,6 +457,14 @@
 									<input type="text" class="form-control input-sm" id="accession-number-id"> </div>
 							</div>
 						</td>
+						<td>
+							<div class="form-group">
+								<label class="control-label">Patient name</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="patient-name-id"> </div>
+							</div>
+						</td>
+	
 						<td>
 							<div class="form-group">
 								<label class="control-label">Date of birth</label>
@@ -478,6 +493,7 @@
 				<thead>
 					<tr>
 						<th style="width: 1%;">Save</th>
+						<th style="width: 20%;">Study Instance UID</th>
 						<th style="width: 20%;">Accession number</th>
 						<th>Patient name</th>
 						<th style="width: 25%;">Patient date of birth</th>

@@ -4,6 +4,7 @@ import "errors"
 import "dtools/gdcmgobr"
 import "encoding/json"
 import "log"
+import "strings"
 
 type DClient struct {
 	CallerAE_Title string
@@ -25,7 +26,7 @@ func (dc *DClient) CStore(cStorReq CStorReq) (CStorReq, error) {
 	ip := cStorReq.ServerSet.Address
 	port := cStorReq.ServerSet.Port
 	fls := cStorReq.File
-	isStore := gdcmgobr.CStore(ip, port, sae, cae, fls)
+	isStore := gdcmgobr.CStore(ip, port, cae, sae, fls)
 	if !isStore {
 		return CStorReq{}, errors.New("error: can't store dicom file " + fls)
 	}
@@ -44,9 +45,10 @@ func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
 	an := cgt.FindReq.AccessionNumber
 	bd := cgt.FindReq.PatienDateOfBirth
 	sd := cgt.FindReq.StudyDate
+	stid := cgt.FindReq.StudyInstanceUID
 	fp := cgt.Folder
-	log.Println(sae, cae, ip, port, pn, an, bd, sd, fp)
-	cget := gdcmgobr.CGet(sae, cae, ip, port, pn, an, bd, sd, fp)
+	log.Println(sae, cae, ip, port, stid, pn, an, bd, sd, fp)
+	cget := gdcmgobr.CGet(cae, sae, ip, port, stid, pn, an, bd, sd, fp)
 	if !cget {
 		return CGetReq{}, errors.New("error: can't cget dicom file " + pn)
 	}
@@ -65,12 +67,15 @@ func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
 	an := freq.AccessionNumber
 	bd := freq.PatienDateOfBirth
 	sd := freq.StudyDate
-	cfindResult := gdcmgobr.CFind(sae, cae, ip, port, pn, an, bd, sd)
+	stid := freq.StudyInstanceUID
+	cfindResult := gdcmgobr.CFind(cae, sae, ip, port, stid, pn, an, bd, sd)
+	cfindResult = strings.Replace(cfindResult, string(0), "", -1)
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)
 	if err != nil {
 		return nil, errors.New("error: can't parse dicom cFind result data " + err.Error() + cfindResult)
 	}
+
 	return fdat, nil
 }
 func (dc *DClient) CEcho(dicomCEchoRequest EchoReq) (EchoRes, error) {
@@ -78,7 +83,7 @@ func (dc *DClient) CEcho(dicomCEchoRequest EchoReq) (EchoRes, error) {
 		return EchoRes{}, err
 	}
 	//	log.Printf("info: dicomCEchoRequest.ServerAE_Title=%v dc.CallerAE_Title=%v ",dicomCEchoRequest.ServerAE_Title, dc.CallerAE_Title)
-	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dicomCEchoRequest.ServerAE_Title, dc.CallerAE_Title)
+	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dc.CallerAE_Title, dicomCEchoRequest.ServerAE_Title)
 	dicomCEchoResult := EchoRes{IsAlive: isAlive}
 	return dicomCEchoResult, nil
 }
