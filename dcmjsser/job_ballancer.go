@@ -49,13 +49,13 @@ func (jbal *JobBallancer) startJob(jdat interface{}) {
 func (jbal *JobBallancer) takeJob() {
 	for {
 		//extract job from queue
-		 := <-jbal.jChan
+		recivedTask := <-jbal.jChan
 		log.Println("info: job taken")
 		switch job := recivedTask.(type) {
 		case TermJob:
 			//if we recive terminate signal need return
 			log.Println("info: recive terminate dispatch singal")
-			returrecivedTaskn
+			return
 		case Job:
 			//regular dispath
 			if len(jbal.acJob) < jbal.aJobC {
