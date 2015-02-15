@@ -11,15 +11,6 @@ std::vector<bool> TestVec()
 	std::vector<bool> cfindResult;
 	return cfindResult;
 }
-static uint16_t CSPPort=50000;
-uint16_t getCSPPort()
-{
-uint16_t retval=CSPPort;
-++CSPPort;
-if (CSPPort>51000)
-		CSPPort=50000;
-return retval;
-}
 
 bool CEcho (std::string remote, int portno, std::string aetitle,std::string call){
 	return gdcm::CompositeNetworkFunctions::CEcho(remote.c_str(),portno,aetitle.c_str(),call.c_str());
@@ -77,17 +68,13 @@ bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,st
       std::cerr << "You have not constructed a valid find query. Please try again." << std::endl;
       return false;
       } 
-	uint16_t cscp=getCSPPort();
-	std::cout<<"portcsp:"<<cscp;
-   return gdcm::CompositeNetworkFunctions::CMove(hostname.c_str(), (uint16_t)port,theQuery,cscp, aetitle.c_str(),call.c_str(),SFolder.c_str());
+   return gdcm::CompositeNetworkFunctions::CMove(hostname.c_str(), (uint16_t)port,theQuery,50104, aetitle.c_str(),call.c_str(),SFolder.c_str());
   
 }
 
 
-std::string CFind(std::string aetitle,std::string call,std::string hostname,int port ,std::string StudyInstanceUID,
-			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
-			std::string StudyDate)
-{	
+std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,std::string  StudyInstanceUID,std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,std::string StudyDate)
+{
     std::vector< std::pair<gdcm::Tag, std::string> > keys;
 	if(StudyInstanceUID.size()!=0)
     	keys.push_back(std::make_pair(gdcm::Tag(0x0020,0x000D),StudyInstanceUID));
@@ -122,14 +109,13 @@ std::string CFind(std::string aetitle,std::string call,std::string hostname,int 
       } 
 
 	 std::vector<gdcm::DataSet> theDataSet;
-    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet, aetitle.c_str(),call.c_str()) )
+	//std::cout<<"cfb"<<std::endl;
+    if( !gdcm::CompositeNetworkFunctions::CFind(hostname.c_str(), (uint16_t)port, theQuery, theDataSet, callingaetitle.c_str(),callaetitle.c_str()) )
       {
-		std::cout<<"cfind err";
         return "[]";
       }
-
+	//std::cout<<"cfe"<<std::endl;
 	std::string reqRes="[";
-	std::cout<<"res c:"<<theDataSet.size();
     for(int i=0;i<theDataSet.size();i++)
       {
 		gdcm::DataSet dat=theDataSet[i];
@@ -170,7 +156,6 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
 	char l=*file.end();
       if(gdcm::System::FileIsDirectory(file.c_str()))
         {
-		//std::cout<<"info: detect directory cstore mode"<<std::endl;
         gdcm::Directory::FilenamesType files;
         gdcm::Directory dir;
         dir.Load(file, true);
@@ -180,10 +165,8 @@ bool CStore (std::string remote, int portno, std::string aetitle, std::string ca
       else
         {
         // This is a file simply add it
-		//std::cout<<"info: detect file cstore mode"<<std::endl;
         thefiles.push_back(file);
      }
-  	//std::cout<<remote.c_str()<<"   "<<portno<<"   "<<aetitle<<"   "<<call<<std::endl;
     bool didItWork = gdcm::CompositeNetworkFunctions::CStore(remote.c_str(), (uint16_t)portno, thefiles, aetitle.c_str(), call.c_str());
     gdcmDebugMacro( (didItWork ? "Store was successful." : "Store failed.") );
     return didItWork;

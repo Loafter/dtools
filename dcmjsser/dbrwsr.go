@@ -1,7 +1,6 @@
 package main
 
 import "errors"
-import "path"
 import "io/ioutil"
 import "log"
 import "path/filepath"
@@ -9,11 +8,6 @@ import "path/filepath"
 type Finfo struct {
 	Name  string
 	IsDir bool
-}
-
-func Chd(dir string) (string, []Finfo, error) {
-	nd := path.Dir(dir)
-	return Lsd(nd)
 }
 
 func Lsd(dir string) (string, []Finfo, error) {

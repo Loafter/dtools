@@ -3,7 +3,6 @@ package main
 import "errors"
 import "dtools/gdcmgobr"
 import "encoding/json"
-import "log"
 import "strings"
 
 type DClient struct {
@@ -47,7 +46,6 @@ func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
 	sd := cgt.FindReq.StudyDate
 	stid := cgt.FindReq.StudyInstanceUID
 	fp := cgt.Folder
-	log.Println(sae, cae, ip, port, stid, pn, an, bd, sd, fp)
 	cget := gdcmgobr.CGet(cae, sae, ip, port, stid, pn, an, bd, sd, fp)
 	if !cget {
 		return CGetReq{}, errors.New("error: can't cget dicom file " + pn)
@@ -75,14 +73,12 @@ func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
 	if err != nil {
 		return nil, errors.New("error: can't parse dicom cFind result data " + err.Error() + cfindResult)
 	}
-
 	return fdat, nil
 }
 func (dc *DClient) CEcho(dicomCEchoRequest EchoReq) (EchoRes, error) {
 	if err := dc.checRequisites(); err != nil {
 		return EchoRes{}, err
 	}
-	//	log.Printf("info: dicomCEchoRequest.ServerAE_Title=%v dc.CallerAE_Title=%v ",dicomCEchoRequest.ServerAE_Title, dc.CallerAE_Title)
 	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dc.CallerAE_Title, dicomCEchoRequest.ServerAE_Title)
 	dicomCEchoResult := EchoRes{IsAlive: isAlive}
 	return dicomCEchoResult, nil

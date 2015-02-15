@@ -37,7 +37,7 @@ func (jbal *JobBallancer) startJob(jdat interface{}) {
 	job := jdat.(Job)
 	dispResult, err := jbal.jobDisp.Dispatch(job.Data)
 	if err != nil {
-		log.Println("info: failed job detected")
+		log.Println("info: failed job detected", err)
 		jbal.jChan <- FaJob{Job: job, ErrorData: err}
 	} else {
 		log.Printf("info: completed job detected %v", dispResult)
@@ -49,13 +49,13 @@ func (jbal *JobBallancer) startJob(jdat interface{}) {
 func (jbal *JobBallancer) takeJob() {
 	for {
 		//extract job from queue
-		recivedTask := <-jbal.jChan
+		 := <-jbal.jChan
 		log.Println("info: job taken")
 		switch job := recivedTask.(type) {
 		case TermJob:
 			//if we recive terminate signal need return
 			log.Println("info: recive terminate dispatch singal")
-			return
+			returrecivedTaskn
 		case Job:
 			//regular dispath
 			if len(jbal.acJob) < jbal.aJobC {
@@ -144,7 +144,6 @@ func (jbal *JobBallancer) resumeJobs() {
 			jbal.JbDone.Done()
 			go jbal.PushJob(jb.Data)
 		} else {
-
 			return
 		}
 		jbc--
@@ -208,7 +207,6 @@ func (jbal JobBallancer) GetJobsList() ([]string, error) {
 		} else {
 			descr = append(descr, "sleeping job: this type job don't have description")
 		}
-
 	}
 	return descr, nil
 }

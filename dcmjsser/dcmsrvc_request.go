@@ -47,7 +47,7 @@ func (freq *FindReq) InitFromJsonData(data []byte) error {
 }
 
 func (freq FindReq) GetDescript() string {
-	st := freq.PatientName + " " + freq.AccessionNumber + " " + freq.PatienDateOfBirth + " " + freq.StudyDate
+	st := freq.StudyInstanceUID + " " + freq.PatientName + " " + freq.AccessionNumber + " " + freq.PatienDateOfBirth + " " + freq.StudyDate
 	return "C-Find request: " + freq.ServerSet.Address + ":" + strconv.Itoa(freq.ServerSet.Port) + " " + st
 }
 
@@ -94,6 +94,6 @@ func (cgt *CGetReq) InitFromJsonData(data []byte) error {
 }
 
 func (cgt CGetReq) GetDescript() string {
-	st := cgt.FindReq.PatientName + " " + cgt.FindReq.AccessionNumber + " " + cgt.FindReq.PatienDateOfBirth + " " + cgt.FindReq.StudyDate
+	st := cgt.FindReq.StudyInstanceUID + cgt.FindReq.PatientName + " " + cgt.FindReq.AccessionNumber + " " + cgt.FindReq.PatienDateOfBirth + " " + cgt.FindReq.StudyDate
 	return "C-Get request: " + st
 }
