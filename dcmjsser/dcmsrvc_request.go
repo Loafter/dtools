@@ -94,6 +94,6 @@ func (cgt *CGetReq) InitFromJsonData(data []byte) error {
 }
 
 func (cgt CGetReq) GetDescript() string {
-	st := cgt.FindReq.StudyInstanceUID + cgt.FindReq.PatientName + " " + cgt.FindReq.AccessionNumber + " " + cgt.FindReq.PatienDateOfBirth + " " + cgt.FindReq.StudyDate
+	st := cgt.FindReq.StudyInstanceUID + " " + cgt.FindReq.PatientName + " " + cgt.FindReq.AccessionNumber + " " + cgt.FindReq.PatienDateOfBirth + " " + cgt.FindReq.StudyDate
 	return "C-Get request: " + st
 }
