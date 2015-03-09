@@ -1,9 +1,0 @@
-/* File : example.i */
-%module gdcmgobrg
- %{
- /* Includes the header in the wrapper code */
- #include "gdcmgobr.h"
- %}
- /* Parse the header file to generate wrappers */
-%include <std_string.i>
-%include "gdcmgobr.h"
