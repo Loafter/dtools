@@ -3,8 +3,7 @@ package main
 import "testing"
 import "log"
 import "time"
-
-//import "strconv"
+import "strconv"
 
 type TestJobDispatcher struct {
 	i int
@@ -15,13 +14,18 @@ func (test *TestJobDispatcher) Dispatch(data interface{}) (interface{}, error) {
 	test.i++
 
 	log.Printf("info: try dispatch data %v", data)
+	/*if math.Mod(float64(test.i), 2) == 0.0 {
+		return nil, errors.New("gen error")
+	} else {*/
 	return data, nil
+	//}
 }
 
 type TestErrorDispatcher struct {
 }
 
 func (*TestErrorDispatcher) DispatchError(failedJob FaJob) error {
+	//log.Printf("info: TestErrorDispatcher job %v job data %v \n", failedJob)
 	return nil
 }
 
@@ -29,10 +33,10 @@ type TestCompletedDispatcher struct {
 }
 
 func (*TestCompletedDispatcher) DispatchSuccess(completedJob CompJob) error {
+	//log.Printf("info: TestCompletedDispatcher job %v job data %v \n", completedJob)
 	return nil
 }
 
-/*
 func TestJobBallancer(t *testing.T) {
 	testJobDispatcher := TestJobDispatcher{}
 	testErrorDispatcher := TestErrorDispatcher{}
@@ -46,7 +50,6 @@ func TestJobBallancer(t *testing.T) {
 	jobBallancer.TerminateTakeJob()
 
 }
-*/
 
 func TestDicomCEchoClient(t *testing.T) {
 	dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
@@ -61,14 +64,16 @@ func TestDicomCEchoClient(t *testing.T) {
 func TestDicomCFindClient(t *testing.T) {
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
 	disp := DDisp{dCln: dcomClient}
-	dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, StudyDate: "*", StudyInstanceUID: "*", AccessionNumber: "*", PatienDateOfBirth: "*", PatientName: "a*"}
-	go func() {
-		if result, err := disp.Dispatch(dicomCFindRequest); err != nil {
-			t.Errorf("error: Test stop fail %v", err)
-		} else {
-			log.Println(result)
-		}
-	}()
+	for i := 0; i < 10; i++ {
+		dicomCFindRequest := FindReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, PatientName: "A*"}
+		go func() {
+			if result, err := disp.Dispatch(dicomCFindRequest); err != nil {
+				t.Errorf("error: Test stop fail %v", err)
+			} else {
+				log.Println(result)
+			}
+		}()
+	}
 	time.Sleep(time.Second * 6)
 }
 
