@@ -31,6 +31,7 @@ type DJsServ struct {
 func (srv *DJsServ) Start(listenPort int) error {
 	srv.jbBal.Init(&srv.dDisp, srv, srv)
 	srv.dDisp.dCln.CallerAE_Title = "AE_DTLS"
+	http.HandleFunc("/", srv.Redirect)
 	http.HandleFunc("/c-echo", srv.cEcho)
 	http.HandleFunc("/c-find", srv.cFind)
 	http.HandleFunc("/c-get", srv.cGet)
@@ -267,6 +268,11 @@ func (srv *DJsServ) chd(rwr http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rwr.Write(js)
+}
+
+//redirect all the wrong unplanned queries to index
+func (service *DJsServ) Redirect(responseWriter http.ResponseWriter, request *http.Request) {
+	http.Redirect(responseWriter, request, "/index.html", 301)
 }
 
 func (srv *DJsServ) cStore(rwr http.ResponseWriter, req *http.Request) {
