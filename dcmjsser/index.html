@@ -195,6 +195,29 @@
 				type: "POST",
 				data: JSON.stringify(cfdat),
 				dataType: "json"
+			}).done(function(jsonData) {
+				$("#serchreslist").remove()
+				var inerHtml = ""
+				inerHtml = inerHtml.concat('<tbody id="serchreslist">')
+				for (index in jsonData) {
+					an = jsonData[index].AccessionNumber
+					pd = jsonData[index].PatienDateOfBirth
+					sd = jsonData[index].StudyDate
+					pn = jsonData[index].PatientName
+					stuid = jsonData[index].StudyInstanceUID
+					gu = createUUID()
+					inerHtml = inerHtml.concat('<tr>')
+					inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Download</a></td>')
+					inerHtml = inerHtml.concat('<td id="' + 'stuid' + gu + '" >' + stuid + '</td>')
+					inerHtml = inerHtml.concat('<td id="' + 'an' + gu + '" >' + an + '</td>')
+					inerHtml = inerHtml.concat('<td id="' + 'pn' + gu + '" >' + pn + '</td>')
+					inerHtml = inerHtml.concat('<td id="' + 'pd' + gu + '" >' + pd + '</td>')
+					inerHtml = inerHtml.concat('<td id="' + 'sd' + gu + '" >' + sd + '</td>')
+					inerHtml = inerHtml.concat('</tr>')
+				}
+				inerHtml = inerHtml.concat(' </tbody>')
+				$("#sertable-id").append(inerHtml)
+				console.log(jsonData.CfindRes)
 			})
 		}
 
@@ -211,43 +234,7 @@
 			return uuid;
 		}
 
-		function updateCFindSt() {
-			$.ajax({
-				url: "/c-finddat",
-				type: "POST",
-				data: JSON.stringify(cfTime),
-				dataType: "json"
-			}).done(function(jsonData) {
-				if (jsonData.Refresh) {
-					cfTime = jsonData.FTime
-					$("#serchreslist").remove()
-					var inerHtml = ""
-					inerHtml = inerHtml.concat('<tbody id="serchreslist">')
-					for (index in jsonData.CfindRes) {
-						an = jsonData.CfindRes[index].AccessionNumber
-						pd = jsonData.CfindRes[index].PatienDateOfBirth
-						sd = jsonData.CfindRes[index].StudyDate
-						pn = jsonData.CfindRes[index].PatientName
-						stuid = jsonData.CfindRes[index].StudyInstanceUID
-						gu = createUUID()
-						inerHtml = inerHtml.concat('<tr>')
-						inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Download</a></td>')
-						inerHtml = inerHtml.concat('<td id="' + 'stuid' + gu + '" >' + stuid + '</td>')
-						inerHtml = inerHtml.concat('<td id="' + 'an' + gu + '" >' + an + '</td>')
-						inerHtml = inerHtml.concat('<td id="' + 'pn' + gu + '" >' + pn + '</td>')
-						inerHtml = inerHtml.concat('<td id="' + 'pd' + gu + '" >' + pd + '</td>')
-						inerHtml = inerHtml.concat('<td id="' + 'sd' + gu + '" >' + sd + '</td>')
-						inerHtml = inerHtml.concat('</tr>')
-					}
-					inerHtml = inerHtml.concat(' </tbody>')
-					$("#sertable-id").append(inerHtml)
-					console.log(jsonData.CfindRes)
-				} else {
-					//console.log("no need to update")
-				}
-			})
-		}
-
+		
 		function chDir(e) {
 			var nDir = {
 				New: e.id,
@@ -367,7 +354,6 @@
 			updateUi()
 				//updateCEchoSt()
 			setInterval(updateCEchoSt, 700)
-			setInterval(updateCFindSt, 400)
 			setInterval(updateJobs, 2000)
 			firsUpdate()
 		}
