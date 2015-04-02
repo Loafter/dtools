@@ -142,22 +142,25 @@ func (jbal *JobBallancer) resumeJobs() {
 			jb := jbal.slJob[val]
 			delete(jbal.slJob, val)
 			jbal.JbDone.Done()
-			go jbal.PushJob(jb.Data)
+			go jbal.insertToChannel(jb)
 		} else {
 			return
 		}
 		jbc--
 	}
-
 }
-func (jbal *JobBallancer) PushJob(jdat interface{}) error {
+func (jbal *JobBallancer) insertToChannel(jb Job) {
+	jbal.jChan <- jb
+}
+
+func (jbal *JobBallancer) PushJob(jdat interface{}) (string, error) {
 	if jbal.checkInit() {
-		return errors.New("error: JobChan is not inited")
+		return "", errors.New("error: JobChan is not inited")
 	}
 	uid := genUid()
 	job := Job{JobId: uid, Data: jdat}
-	jbal.jChan <- job
-	return nil
+	jbal.insertToChannel(job)
+	return uid, nil
 
 }
 

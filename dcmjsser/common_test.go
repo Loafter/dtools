@@ -51,6 +51,7 @@ func TestJobBallancer(t *testing.T) {
 
 }
 
+/*
 func TestDicomCEchoClient(t *testing.T) {
 	dicomCEchoRequest := EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
@@ -76,7 +77,7 @@ func TestDicomCFindClient(t *testing.T) {
 	}
 	time.Sleep(time.Second * 6)
 }
-
+*/
 func TestDicomCStoreClient(t *testing.T) {
 	/*dicomCStoreRequest := CStorReq{ServerSet: EchoReq{Address: "213.165.94.158", Port: 104, ServerAE_Title: "GEPACS"}, File: "/home/andrew/Downloads/Dicom/ToSend/IM-0001-0041.dcm"}
 	dcomClient := DClient{CallerAE_Title: "AE_DTOOLS"}
