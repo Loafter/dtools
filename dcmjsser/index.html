@@ -283,8 +283,7 @@
 			$("#files-tab").append(inerHtmlfiles)
 		}
 
-		function updateJobs() {
-			$("#jobslist").html("")
+		function updateJobs() {	
 			$.ajax({
 				url: "/jobs",
 				type: "POST",
@@ -294,6 +293,7 @@
 				for (index in jsonData) {
 					inerHtmljobs = inerHtmljobs.concat('<li class="list-group-item">' + jsonData[index] + '</li>')
 				}
+				$("#jobslist").html("")
 				$("#jobslist").append(inerHtmljobs)
 			})
 		}
