@@ -6,21 +6,10 @@ import "encoding/json"
 import "strings"
 
 type DClient struct {
-	CallerAE_Title string
-}
-
-func (dc *DClient) checRequisites() error {
-	if len(dc.CallerAE_Title) == 0 {
-		return errors.New("error: CallerAE_Title is empty")
-	}
-	return nil
 }
 
 func (dc *DClient) CStore(cStorReq CStorReq) (CStorReq, error) {
-	if err := dc.checRequisites(); err != nil {
-		return CStorReq{}, err
-	}
-	cae := dc.CallerAE_Title
+	cae := cStorReq.ServerSet.ClientAE_Title
 	sae := cStorReq.ServerSet.ServerAE_Title
 	ip := cStorReq.ServerSet.Address
 	port := cStorReq.ServerSet.Port
@@ -33,10 +22,7 @@ func (dc *DClient) CStore(cStorReq CStorReq) (CStorReq, error) {
 }
 
 func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
-	if err := dc.checRequisites(); err != nil {
-		return CGetReq{}, err
-	}
-	cae := dc.CallerAE_Title
+	cae := cgt.FindReq.ServerSet.ClientAE_Title
 	sae := cgt.FindReq.ServerSet.ServerAE_Title
 	ip := cgt.FindReq.ServerSet.Address
 	port := cgt.FindReq.ServerSet.Port
@@ -54,10 +40,8 @@ func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
 }
 
 func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
-	if err := dc.checRequisites(); err != nil {
-		return nil, err
-	}
-	cae := dc.CallerAE_Title
+
+	cae := freq.ServerSet.ClientAE_Title
 	sae := freq.ServerSet.ServerAE_Title
 	ip := freq.ServerSet.Address
 	port := freq.ServerSet.Port
@@ -76,10 +60,7 @@ func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
 	return fdat, nil
 }
 func (dc *DClient) CEcho(dicomCEchoRequest EchoReq) (EchoRes, error) {
-	if err := dc.checRequisites(); err != nil {
-		return EchoRes{}, err
-	}
-	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dc.CallerAE_Title, dicomCEchoRequest.ServerAE_Title)
+	isAlive := gdcmgobr.CEcho(dicomCEchoRequest.Address, dicomCEchoRequest.Port, dicomCEchoRequest.ClientAE_Title, dicomCEchoRequest.ServerAE_Title)
 	dicomCEchoResult := EchoRes{IsAlive: isAlive}
 	return dicomCEchoResult, nil
 }

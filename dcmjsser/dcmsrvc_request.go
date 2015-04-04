@@ -9,6 +9,7 @@ type EchoReq struct {
 	Address        string `json:"Address"`
 	Port           int    `json:"Port,string"`
 	ServerAE_Title string `json:"ServerAE_Title"`
+	ClientAE_Title string `json:"ClientAE_Title"`
 }
 
 func (ereq EchoReq) GetDescript() string {

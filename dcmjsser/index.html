@@ -130,7 +130,8 @@
 			var cEChoReq = {
 				Address: $("#address-id").val(),
 				Port: $("#port-id").val(),
-				ServerAE_Title: $("#aetitle-id").val()
+				ClientAE_Title: $("#client-aetitle-id").val(),
+				ServerAE_Title: $("#server-aetitle-id").val()
 			};
 			$.ajax({
 				url: "/c-echo",
@@ -182,7 +183,8 @@
 				ServerSet: {
 					Address: $("#address-id").val(),
 					Port: $("#port-id").val(),
-					ServerAE_Title: $("#aetitle-id").val()
+					ClientAE_Title: $("#client-aetitle-id").val(),
+					ServerAE_Title: $("#server-aetitle-id").val()
 				},
 				StudyInstanceUID: $("#st-inst-uid").val(),
 				PatientName: $("#patient-name-id").val(),
@@ -308,7 +310,8 @@
 				ServerSet: {
 					Address: $("#address-id").val(),
 					Port: $("#port-id").val(),
-					ServerAE_Title: $("#aetitle-id").val()
+					ClientAE_Title: $("#client-aetitle-id").val(),
+					ServerAE_Title: $("#server-aetitle-id").val()
 				},
 				StudyInstanceUID: stduid,
 				PatientName: pn,
@@ -335,7 +338,8 @@
 				ServerSet: {
 					Address: $("#address-id").val(),
 					Port: $("#port-id").val(),
-					ServerAE_Title: $("#aetitle-id").val()
+					ClientAE_Title: $("#client-aetitle-id").val(),
+					ServerAE_Title: $("#server-aetitle-id").val()
 				},
 				File: fp,
 			}
@@ -403,11 +407,18 @@
 									<input type="text" class="form-control input-sm" id="address-id" value="213.165.94.158"> </div>
 							</div>
 						</td>
+							<td>
+							<div class="form-group">
+								<label class="control-label">Client-AE-Title</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="client-aetitle-id" value="AE_DTLS"> </div>
+							</div>
+						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label">AE-Title</label>
+								<label class="control-label">Server-AE-Title</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="aetitle-id" value="DCM4CHEE"> </div>
+									<input type="text" class="form-control input-sm" id="server-aetitle-id" value="DCM4CHEE"> </div>
 							</div>
 						</td>
 						<td>
