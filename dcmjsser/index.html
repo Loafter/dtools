@@ -111,9 +111,7 @@
 		@media screen and(min-width: 768px) {
 			/* Remove the padding we set earlier */
 			
-			.masthead,
-			.marketing,
-			.footer {
+			.masthead, .marketing, .footer {
 				padding-left: 0;
 				padding-right: 0;
 			}
@@ -145,11 +143,6 @@
 		}
 
 		function updateUi() {
-			if (disAlive) {
-				$("#pacs-status-id").text("ok")
-			} else {
-				$("#pacs-status-id").text("no connection")
-			}
 			if (disAlive && (ShowMenu == "search")) {
 				$("#search-panel").show()
 				$("#search-footer").show()
@@ -285,7 +278,7 @@
 			$("#files-tab").append(inerHtmlfiles)
 		}
 
-		function updateJobs() {	
+		function updateJobs() {
 			$.ajax({
 				url: "/jobs",
 				type: "POST",
@@ -354,9 +347,8 @@
 
 		function OnLoad() {
 			cfTime = 0.0;
+			disAlive = false
 			updateUi()
-				//updateCEchoSt()
-			setInterval(updateCEchoSt, 700)
 			setInterval(updateJobs, 2000)
 			firsUpdate()
 		}
@@ -407,16 +399,16 @@
 									<input type="text" class="form-control input-sm" id="address-id" value="213.165.94.158"> </div>
 							</div>
 						</td>
-							<td>
+						<td>
 							<div class="form-group">
-								<label class="control-label">Client-AE-Title</label>
+								<label class="control-label">Client AE-Title</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="client-aetitle-id" value="AE_DTLS"> </div>
 							</div>
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label">Server-AE-Title</label>
+								<label class="control-label">Server AE-Title</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="server-aetitle-id" value="DCM4CHEE"> </div>
 							</div>
@@ -430,10 +422,8 @@
 						</td>
 						<td>
 							<div class="form-group">
-								<label class="control-label">DICOM ping status:</label>
-								<p>
-									<label class="control-label" id="pacs-status-id">OK</label>
-								</p>
+								<label class="control-label"> </label>
+								<div class="controls"> <a onclick="updateCEchoSt()" class="btn pull-left btn-info">P I N G</a> </div>
 							</div>
 						</td>
 					</tr>

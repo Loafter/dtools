@@ -98,8 +98,6 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
       std::cerr << "Query construction failed." <<std::endl;
       return "";
       }
-
-	;
     //doing a non-strict query, the second parameter there.
     //look at the base query comments
     if (!theQuery->ValidateQuery(false))
@@ -131,6 +129,7 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
 			reqRes=reqRes+"\"}, \n";
       }
 	reqRes=reqRes+"] \n";
+	std::cout<<reqRes<<std::endl;
 	return reqRes;
 }
 
