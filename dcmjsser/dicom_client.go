@@ -31,8 +31,9 @@ func (dc *DClient) CGet(cgt CGetReq) (CGetReq, error) {
 	bd := cgt.FindReq.PatienDateOfBirth
 	sd := cgt.FindReq.StudyDate
 	stid := cgt.FindReq.StudyInstanceUID
+	pid := cgt.FindReq.PatientID
 	fp := cgt.Folder
-	cget := gdcmgobr.CGet(cae, sae, ip, port, stid, pn, an, bd, sd, fp)
+	cget := gdcmgobr.CGet(cae, sae, ip, port, stid, pn, an, bd, sd, pid, fp)
 	if !cget {
 		return CGetReq{}, errors.New("error: can't cget dicom file " + pn)
 	}
@@ -50,8 +51,10 @@ func (dc *DClient) CFind(freq FindReq) ([]FindRes, error) {
 	bd := freq.PatienDateOfBirth
 	sd := freq.StudyDate
 	stid := freq.StudyInstanceUID
-	cfindResult := gdcmgobr.CFind(cae, sae, ip, port, stid, pn, an, bd, sd)
+	pid := freq.PatientID
+	cfindResult := gdcmgobr.CFind(cae, sae, ip, port, stid, pn, an, bd, sd, pid)
 	cfindResult = strings.Replace(cfindResult, string(0), "", -1)
+	//cfindResult = strings.Replace(cfindResult, "\"", " ", -1)
 	var fdat []FindRes
 	err := json.Unmarshal([]byte(cfindResult), &fdat)
 	if err != nil {

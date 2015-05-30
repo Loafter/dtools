@@ -183,6 +183,7 @@
 				PatientName: $("#patient-name-id").val(),
 				AccessionNumber: $("#accession-number-id").val(),
 				PatienDateOfBirth: $("#date-birth-id").val(),
+				PatientID: $("#patientid-id").val(),
 				StudyDate: $("#study-date-id").val()
 			};
 			$.ajax({
@@ -199,11 +200,15 @@
 					pd = jsonData[index].PatienDateOfBirth
 					sd = jsonData[index].StudyDate
 					pn = jsonData[index].PatientName
+					pid=jsonData[index].PatientID
 					stuid = jsonData[index].StudyInstanceUID
 					gu = createUUID()
+					gup = createUUID()
 					inerHtml = inerHtml.concat('<tr>')
-					inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Download</a></td>')
+					inerHtml = inerHtml.concat('<td><a id="' + gu + '" onclick="sendCGet(this)" class="btn pull-left btn-success btn-xs">Study</a> </td>')
 					inerHtml = inerHtml.concat('<td id="' + 'stuid' + gu + '" >' + stuid + '</td>')
+					inerHtml = inerHtml.concat('<td><a id="' + 'pidb' + gu+ '" onclick="sendCGetPatient(this)" class="btn pull-left btn-warning btn-xs">Patient</a> </td>')
+					inerHtml = inerHtml.concat('<td id="' + 'pid' + gu + '" >' + pid + '</td>')
 					inerHtml = inerHtml.concat('<td id="' + 'an' + gu + '" >' + an + '</td>')
 					inerHtml = inerHtml.concat('<td id="' + 'pn' + gu + '" >' + pn + '</td>')
 					inerHtml = inerHtml.concat('<td id="' + 'pd' + gu + '" >' + pd + '</td>')
@@ -212,7 +217,6 @@
 				}
 				inerHtml = inerHtml.concat(' </tbody>')
 				$("#sertable-id").append(inerHtml)
-				console.log(jsonData.CfindRes)
 			})
 		}
 
@@ -324,6 +328,31 @@
 				dataType: "json"
 			})
 		}
+		
+		function sendCGetPatient(e) {
+			patid = $("#pid" + e.id.substring(4)).text()
+			var cfdat = {
+				ServerSet: {
+					Address: $("#address-id").val(),
+					Port: $("#port-id").val(),
+					ClientAE_Title: $("#client-aetitle-id").val(),
+					ServerAE_Title: $("#server-aetitle-id").val()
+				},
+				PatientID: patid,
+			}
+			var cg = {
+				FindReq: cfdat,
+				Folder: curdir
+			}
+			console.log(cg)
+			$.ajax({
+				url: "/c-get",
+				type: "POST",
+				data: JSON.stringify(cg),
+				dataType: "json"
+			})
+		}
+
 
 		function sendCStore(e) {
 			var fp = curdir + '/' + e.id.substring(2)
@@ -349,7 +378,6 @@
 			cfTime = 0.0;
 			disAlive = false
 			updateUi()
-			setInterval(updateJobs, 2000)
 			firsUpdate()
 		}
 
@@ -410,7 +438,7 @@
 							<div class="form-group">
 								<label class="control-label">Server AE-Title</label>
 								<div class="controls">
-									<input type="text" class="form-control input-sm" id="server-aetitle-id" value="DCM4CHEE"> </div>
+									<input type="text" class="form-control input-sm" id="server-aetitle-id" value="AE_ARCH1"> </div>
 							</div>
 						</td>
 						<td>
@@ -449,6 +477,13 @@
 						</td>
 						<td>
 							<div class="form-group">
+								<label class="control-label">Patient ID</label>
+								<div class="controls">
+									<input type="text" class="form-control input-sm" id="patientid-id" value="*"> </div>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
 								<label class="control-label">Patient name</label>
 								<div class="controls">
 									<input type="text" class="form-control input-sm" id="patient-name-id" value="*"> </div>
@@ -483,6 +518,8 @@
 					<tr>
 						<th style="width: 1%;">Save</th>
 						<th style="width: 3%;">Study Instance UID</th>
+						<th style="width: 1%;">Save</th>
+						<th style="width: 3%;">Patient ID</th>
 						<th style="width: 20%;">Accession number</th>
 						<th>Patient name</th>
 						<th style="width: 25%;">Patient date of birth</th>

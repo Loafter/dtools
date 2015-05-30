@@ -32,6 +32,7 @@ type FindReq struct {
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
 	StudyDate         string `json:"StudyDate"`
+	PatientID         string `json:"PatientID"`
 }
 
 type EchoRes struct {
@@ -58,6 +59,7 @@ type FindRes struct {
 	AccessionNumber   string `json:"AccessionNumber"`
 	PatienDateOfBirth string `json:"PatienDateOfBirth"`
 	StudyDate         string `json:"StudyDate"`
+	PatientID         string `json:"PatientID"`
 }
 
 type CStorReq struct {

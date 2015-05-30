@@ -35,11 +35,13 @@ bool CEcho (std::string remote, int portno, std::string aetitle,std::string call
 
 bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,std::string  StudyInstanceUID,
 			std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,
-			std::string StudyDate,std::string SFolder)
+			std::string StudyDate,std::string PatientID,std::string SFolder)
 {	
     std::vector< std::pair<gdcm::Tag, std::string> > keys;
 	if(StudyInstanceUID.size()!=0)
-    	keys.push_back(std::make_pair(gdcm::Tag(0x0020,0x000D),StudyInstanceUID));
+    		keys.push_back(std::make_pair(gdcm::Tag(0x0020,0x000D),StudyInstanceUID));
+	if(PatientID.size()!=0)
+    		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0020),PatientID));
 /*	if(PatientName.size()!=0)
     	keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0010),PatientName));
 	if(AccessionNumber.size()!=0)
@@ -74,7 +76,7 @@ bool CGet(std::string aetitle,std::string call,std::string hostname,int port ,st
 }
 
 
-std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,std::string  StudyInstanceUID,std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,std::string StudyDate)
+std::string CFind(std::string callingaetitle,std::string callaetitle,std::string hostname,int port ,std::string  StudyInstanceUID,std::string PatientName,std::string AccessionNumber,std::string PatienDateOfBirth,std::string StudyDate,std::string PatientID)
 {
     std::vector< std::pair<gdcm::Tag, std::string> > keys;
 	if(StudyInstanceUID.size()!=0)
@@ -87,6 +89,9 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
 		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0030),PatienDateOfBirth));
 	if(StudyDate.size()!=0)
 		keys.push_back(std::make_pair(gdcm::Tag(0x0008,0x0020),StudyDate));
+		
+	if(PatientID.size()!=0)
+    		keys.push_back(std::make_pair(gdcm::Tag(0x0010,0x0020),PatientID));
 
     gdcm::ERootType theRoot = gdcm::eStudyRootType;
     gdcm::EQueryLevel theLevel = gdcm::eStudy;
@@ -122,6 +127,7 @@ std::string CFind(std::string callingaetitle,std::string callaetitle,std::string
 		reqRes=reqRes+"\"PatientName\":\""+GetStringValueFromTag(gdcm::Tag(0x0010,0x0010),dat)+"\",";
 		reqRes=reqRes+"\"AccessionNumber\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0050),dat)+"\",";
 		reqRes=reqRes+"\"PatienDateOfBirth\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0020),dat)+"\",";
+		reqRes=reqRes+"\"PatientID\":\""+GetStringValueFromTag(gdcm::Tag(0x0010,0x0020),dat)+"\",";
 		reqRes=reqRes+"\"StudyDate\":\""+GetStringValueFromTag(gdcm::Tag(0x0008,0x0020),dat);
 		if(i==theDataSet.size()-1)
 			reqRes=reqRes+"\"}";

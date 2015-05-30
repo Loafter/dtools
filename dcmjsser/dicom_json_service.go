@@ -54,7 +54,7 @@ func (srv *DJsServ) cEcho(rwr http.ResponseWriter, req *http.Request) {
 		log.Println(strErr)
 		return
 	}
-
+	log.Print("info: ", dec)
 	ech, err := srv.dDisp.Dispatch(dec)
 	if err != nil {
 		log.Printf("error: can't push job")
@@ -88,6 +88,7 @@ func (srv *DJsServ) cFind(rwr http.ResponseWriter, req *http.Request) {
 		log.Println(strErr)
 		return
 	}
+	log.Print("info: ", fr)
 	if fdat, err := srv.dDisp.Dispatch(fr); err != nil {
 		strErr := "error: can't exec c-find"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
