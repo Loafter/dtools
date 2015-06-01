@@ -41,6 +41,7 @@ func (srv *DJsServ) Start(listenPort int) error {
 func (srv *DJsServ) cEcho(rwr http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	bodyData, err := ioutil.ReadAll(req.Body)
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if err != nil {
 		strErr := "error: Can't read http body data"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
@@ -75,6 +76,7 @@ func (srv *DJsServ) cEcho(rwr http.ResponseWriter, req *http.Request) {
 func (srv *DJsServ) cFind(rwr http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	bodyData, err := ioutil.ReadAll(req.Body)
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if err != nil {
 		strErr := "error: Can't read http body data"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
@@ -109,6 +111,7 @@ func (srv *DJsServ) cFind(rwr http.ResponseWriter, req *http.Request) {
 func (srv *DJsServ) cGet(rwr http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	bodyData, err := ioutil.ReadAll(req.Body)
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if err != nil {
 		strErr := "error: Can't read http body data"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
@@ -174,6 +177,7 @@ func (srv *DJsServ) DispatchSuccess(cjb CompJob) error {
 }
 
 func (srv *DJsServ) jobs(rwr http.ResponseWriter, req *http.Request) {
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if jobs, err := srv.jbBal.GetJobsList(); err != nil {
 		log.Printf("error: can't get jobs list data")
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
@@ -192,6 +196,7 @@ func (srv *DJsServ) chd(rwr http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 
 	bodyData, err := ioutil.ReadAll(req.Body)
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if err != nil {
 		strErr := "error: Can't read http body data"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
@@ -235,6 +240,7 @@ func (service *DJsServ) Redirect(responseWriter http.ResponseWriter, request *ht
 func (srv *DJsServ) cStore(rwr http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	bodyData, err := ioutil.ReadAll(req.Body)
+	rwr.Header().Set("Access-Control-Allow-Origin", "*")
 	if err != nil {
 		strErr := "error: Can't read http body data"
 		http.Error(rwr, err.Error(), http.StatusInternalServerError)
